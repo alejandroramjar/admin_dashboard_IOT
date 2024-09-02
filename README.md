@@ -65,7 +65,7 @@ ubicado en la carpeta `frontend` en la raíz del proyecto y el backend está ubi
 1. Clona el repositorio:
     ```bash
     git clone https://github.com/alejandroramjar/admin_dashboard_IOT.git
-    cd meteoro
+    cd admin_dashboard_IOT
     ```
 
 2. Crea y activa un entorno virtual:
