@@ -10,6 +10,8 @@ def poblar_provincias():
     ]
 
     for provincia_nombre in provincias:
+        if Provincia.objects.filter(nombre=provincia_nombre).exists():
+            print(f'{provincia_nombre} ya existe en base de datos.')
         Provincia.objects.get_or_create(nombre=provincia_nombre)
 
 
@@ -89,7 +91,10 @@ def poblar_municipios():
     for provincia_nombre, municipios in municipios_por_provincia.items():
         provincia = Provincia.objects.get(nombre=provincia_nombre)
         for municipio_nombre in municipios:
-            Municipio.objects.create(nombre=municipio_nombre, provincia=provincia)
+            if Municipio.objects.filter(nombre=municipio_nombre).exists():
+                print(f'Municipio {municipio_nombre} existe en base de datos')
+            else:
+                Municipio.objects.create(nombre=municipio_nombre, provincia=provincia)
 
 
 poblar_provincias()

@@ -95,6 +95,7 @@ ubicado en la carpeta `frontend` en la raíz del proyecto y el backend está ubi
     ```bash
     python manage.py makemigrations
     python manage.py migrate
+    python manage.py poblar_datos
     python manage.py createsuperuser
 
     ```
