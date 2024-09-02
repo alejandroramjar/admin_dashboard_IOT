@@ -126,12 +126,31 @@ ubicado en la carpeta `frontend` en la raíz del proyecto y el backend está ubi
     ```
 
 ## Estructura del Proyecto
-
-meteoro/
-├── .idea/ 
-├── .venv/ 
-├── admin_panel/ 
-├── config/ 
+   ```plaintext
+admin_dashboard_IOT/
+├── backend/
+│ ├── accounts/
+│ │ ├── management/
+│ │ │ └── commands/
+│ │ │   └── poblar_datos.py 
+│ │ ├── migrations/
+│ │ │ └── __init__.py 
+│ │ ├── __init__.py
+│ │ ├── admin.py
+│ │ ├── apps.py
+│ │ ├── models.py
+│ │ ├── tests.py
+│ │ ├── utils.py
+│ │ └── views.py
+│ ├── config/
+│ │ ├── __init__.py
+│ │ ├── settings.py
+│ │ ├── asgi.py
+│ │ ├── urls.py
+│ │ └── wsgi.py
+│ └── manage.py 
+│
+│
 ├── frontend/ 
 │ ├── .github/ 
 │ ├── documentation/ 
@@ -155,15 +174,12 @@ meteoro/
 │ ├── package.json 
 │ ├── README.md 
 │ └── vue.config.js 
-├── pycache/ 
 ├── .gitignore 
-├── db.sqlite3 
 ├── debug.log 
 ├── manage.py 
 ├── README.md 
-├── requirements.txt 
-└── Test_koredata.txt
-
+└── requirements.txt 
+```
 ## Despliegue
 
 ### Backend
