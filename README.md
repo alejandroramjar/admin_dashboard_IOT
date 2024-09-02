@@ -93,6 +93,7 @@ ubicado en la carpeta `frontend` en la raíz del proyecto y el backend está ubi
 
 5. Realiza las migraciones de la base de datos y se crea el súper usuario:
     ```bash
+    cd backend 
     python manage.py makemigrations
     python manage.py migrate
     python manage.py poblar_datos
@@ -109,6 +110,7 @@ ubicado en la carpeta `frontend` en la raíz del proyecto y el backend está ubi
 
 1. Navega a la carpeta `frontend`:
     ```bash
+    cd..
     cd frontend
     ```
 
