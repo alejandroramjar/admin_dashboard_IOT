@@ -64,15 +64,15 @@ ubicado en la carpeta `frontend` en la raíz del proyecto y el backend está ubi
 
 1. Clona el repositorio:
     ```bash
-    git clone https://github.com/alejandroramjar/meteoro.git
+    git clone https://github.com/alejandroramjar/admin_dashboard_IOT.git
     cd meteoro
     ```
 
 2. Crea y activa un entorno virtual:
     ```bash
     pip install virtualenv
-    virtualenv .venv
-    ./.venv/scripts/activate
+    virtualenv .env
+    ./.env/scripts/activate
     ```
 
 3. Instala las dependencias:
