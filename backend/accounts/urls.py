@@ -1,7 +1,14 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import RegistroUsuario, ProvinciaViewSet, MunicipioViewSet
 
-from backend.accounts import views
+router = DefaultRouter()
+app_name = 'accounts'
+
+router.register(r'provincias', ProvinciaViewSet)
+router.register(r'municipios', MunicipioViewSet)
 
 urlpatterns = [
-    path('register/', views.RegistroUsuario, name='register'),
+    path('', include(router.urls)),
+    path('register/', RegistroUsuario.as_view(), name='registro_usuario'),
 ]

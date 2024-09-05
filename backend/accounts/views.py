@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics, status
 # from django.core.mail import send_mail
-from .models import Usuario
-from .serializer import RegisterSerializer
+from .models import Usuario, Municipio, Provincia
+from .serializer import RegisterSerializer, ProvinciaSerializer, MunicipioSerializer, UsuarioSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 
 # Create your views here.
@@ -27,6 +28,24 @@ class RegistroUsuario(generics.CreateAPIView):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
+class ProvinciaViewSet(viewsets.ModelViewSet):
+    queryset = Provincia.objects.all()
+    serializer_class = ProvinciaSerializer
+    permission_classes = [AllowAny]
+
+
+class MunicipioViewSet(viewsets.ModelViewSet):
+    queryset = Municipio.objects.all()
+    serializer_class = MunicipioSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        provincia_id = self.request.query_params.get('provincia')
+        if provincia_id:
+            return self.queryset.filter(provincia_id=provincia_id)
+        return self.queryset
+
 #    def send_registration_email(self, user):
 #        try:
 #            send_mail(
@@ -45,3 +64,16 @@ class RegistroUsuario(generics.CreateAPIView):
 #            )
 #        except Exception as e:
 #            logger.error(f"Error al enviar correos: {e}")
+
+
+class UsuarioViewSet(viewsets.ModelViewSet):
+    queryset = Usuario.objects.all()
+    serializer_class = UsuarioSerializer
+
+@api_view(['POST'])
+def register(request):
+    serializer = UsuarioSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

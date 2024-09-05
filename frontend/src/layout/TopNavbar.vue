@@ -54,11 +54,7 @@
             <div class="divider"></div>
             <a class="dropdown-item" href="#">Separated link</a>
           </base-dropdown>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              Log out
-            </a>
-          </li>
+          <li class="nav-item"><a @click="logout" href="#" class="nav-link"> Cerrar Sesión</a></li>
         </ul>
       </div>
     </div>
@@ -78,6 +74,10 @@
       }
     },
     methods: {
+      async logout() {
+    localStorage.removeItem('token');
+    this.$router.push('/login');
+  },
       capitalizeFirstLetter (string) {
         return string.charAt(0).toUpperCase() + string.slice(1)
       },
