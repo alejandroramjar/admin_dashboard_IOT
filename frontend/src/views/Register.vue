@@ -136,6 +136,7 @@ export default {
 
       try {
         this.loading = true;
+        console.log(formData);
         const response = await axios.post('http://localhost:8000/api/register/', formData);
         console.log(response);
         this.loading = false;

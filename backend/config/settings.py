@@ -40,6 +40,7 @@ THIRD_APPS = [
 ]
 LOCAL_APPS = [
     'accounts',
+    'iot'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_APPS + LOCAL_APPS
 

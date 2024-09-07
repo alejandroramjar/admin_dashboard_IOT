@@ -1,11 +1,17 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics, status
 # from django.core.mail import send_mail
-from .models import Usuario, Municipio, Provincia
-from .serializer import RegisterSerializer, ProvinciaSerializer, MunicipioSerializer, UsuarioSerializer
+from rest_framework import viewsets
+from .models import Variable, Provincia, Municipio, Dispositivo, Usuario, RegistroVariable
+from .serializer import RegisterSerializer, ProvinciaSerializer, MunicipioSerializer, UsuarioSerializer, \
+    DispositivoSerializer, VariableSerializer, ProvinciaSerializer, MunicipioSerializer, DispositivoSerializer, \
+    UsuarioSerializer, RegistroVariableSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework import generics
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
 
 # Create your views here.
@@ -20,7 +26,7 @@ class RegistroUsuario(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
 
         user = serializer.save()
-        user.is_active = False  # Establecer el usuario como inactivo
+        user.is_active = True  # Establecer el usuario como inactivo
         user.save()
 
         # Enviar correo electrónico al usuario
@@ -46,6 +52,34 @@ class MunicipioViewSet(viewsets.ModelViewSet):
             return self.queryset.filter(provincia_id=provincia_id)
         return self.queryset
 
+class VariableViewSet(viewsets.ModelViewSet):
+    queryset = Variable.objects.all()
+    serializer_class = VariableSerializer
+
+class VariableViewSet(viewsets.ModelViewSet):
+    queryset = Variable.objects.all()
+    serializer_class = VariableSerializer
+
+class ProvinciaViewSet(viewsets.ModelViewSet):
+    queryset = Provincia.objects.all()
+    serializer_class = ProvinciaSerializer
+
+class MunicipioViewSet(viewsets.ModelViewSet):
+    queryset = Municipio.objects.all()
+    serializer_class = MunicipioSerializer
+
+class DispositivoViewSet(viewsets.ModelViewSet):
+    queryset = Dispositivo.objects.all()
+    serializer_class = DispositivoSerializer
+
+class UsuarioViewSet(viewsets.ModelViewSet):
+    queryset = Usuario.objects.all()
+    serializer_class = UsuarioSerializer
+
+class RegistroVariableViewSet(viewsets.ModelViewSet):
+    queryset = RegistroVariable.objects.all()
+    serializer_class = RegistroVariableSerializer
+
 #    def send_registration_email(self, user):
 #        try:
 #            send_mail(
@@ -70,6 +104,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
 
+
 @api_view(['POST'])
 def register(request):
     serializer = UsuarioSerializer(data=request.data)
@@ -77,3 +112,24 @@ def register(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# views.py
+
+
+class UserDispositivosList(generics.ListAPIView):
+    serializer_class = DispositivoSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.dispositivos.all()
+
+
+class UserDispositivosCount(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        count = user.dispositivos.count()
+        return Response({'count': count})

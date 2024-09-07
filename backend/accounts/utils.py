@@ -1,6 +1,7 @@
 from .models import Provincia, Municipio
 
 
+
 def poblar_provincias():
     provincias = [
         'Pinar del Río', 'Artemisa', 'La Habana', 'Mayabeque', 'Matanzas',

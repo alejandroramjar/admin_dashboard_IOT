@@ -60,7 +60,7 @@ export default {
     document.getElementById('loader').style.display = 'none'; // Ocultar el indicador de carga
     this.$router.push('admin/table-list');
   } catch (error) {
-    console.error(error);
+    //console.error(error);
     if (error.response && error.response.data) {
       this.showMessage(error.response.data.error || 'Error en la autenticación', 'danger');
     } else {

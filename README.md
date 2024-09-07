@@ -8,6 +8,7 @@ ubicado en la carpeta `frontend` en la raíz del proyecto y el backend está ubi
 - Python 3.8.10
 - Node.js y npm
 - PostgreSQL server
+- MQTT-Explorer-Setup-0.4.0-beta.6 (Instalar)
 
 ## Dependencias y Bibliotecas
 ### Backend
@@ -97,6 +98,7 @@ ubicado en la carpeta `frontend` en la raíz del proyecto y el backend está ubi
     python manage.py makemigrations
     python manage.py migrate
     python manage.py poblar_datos
+    python simulate_service.py
     python manage.py createsuperuser
 
     ```
