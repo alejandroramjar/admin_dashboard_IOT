@@ -1,5 +1,4 @@
-from .models import Provincia, Municipio
-
+from .models import Provincia, Municipio, Variable
 
 
 def poblar_provincias():
@@ -98,5 +97,26 @@ def poblar_municipios():
                 Municipio.objects.create(nombre=municipio_nombre, provincia=provincia)
 
 
+def poblar_variables():
+    variables = [
+        {"nombre": "Temperatura", "descripcion": "Medida del calor en el aire."},
+        {"nombre": "Humedad Relativa", "descripcion": "Porcentaje de vapor de agua en el aire."},
+        {"nombre": "Presión Atmosférica", "descripcion": "Fuerza ejercida por el aire en la atmósfera."},
+        {"nombre": "Velocidad del Viento", "descripcion": "Medida de la rapidez del viento."},
+        {"nombre": "Dirección del Viento", "descripcion": "La dirección de la que sopla el viento."},
+        {"nombre": "Precipitación", "descripcion": "Cantidad de agua caída."},
+        {"nombre": "Radiación Solar", "descripcion": "Energía solar recibida."},
+        {"nombre": "Temperatura del Punto de Rocío", "descripcion": "Temperatura a la que se produce condensación."},
+        {"nombre": "Evaporación", "descripcion": "Proceso por el cual el agua se convierte en vapor."},
+        {"nombre": "Índice de Calor", "descripcion": "Sensación térmica combinando temperatura y humedad."},
+        {"nombre": "Temperatura del Suelo", "descripcion": "Temperatura en la superficie del suelo."},
+        {"nombre": "Altitud", "descripcion": "Altura sobre el nivel del mar."},
+    ]
+
+    for var in variables:
+        Variable.objects.get_or_create(nombre=var["nombre"], descripcion=var["descripcion"])
+
+
 poblar_provincias()
 poblar_municipios()
+poblar_variables()

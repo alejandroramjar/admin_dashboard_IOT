@@ -1,3 +1,5 @@
+import sys
+
 from django.apps import AppConfig
 from django.utils.module_loading import autodiscover_modules
 
@@ -9,5 +11,6 @@ class AccountsConfig(AppConfig):
     # def ready(self):
     #   import accounts.signals
     def ready(self):
-        from .mqtt_client import start_mqtt_client
-        start_mqtt_client()  # Iniciar el cliente MQTT al cargar la aplicación
+        if 'runserver' in sys.argv:
+            from .mqtt_client import start_mqtt_client
+            start_mqtt_client()  # Iniciar el cliente MQTT al cargar la aplicación

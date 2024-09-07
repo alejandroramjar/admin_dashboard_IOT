@@ -1,13 +1,17 @@
 from django.contrib.auth.models import AbstractUser, User
 from django.core.validators import RegexValidator
 from django.db import models
+import paho.mqtt.client as mqtt
+import json
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 # Create your models here.
 
 class Variable(models.Model):
-    nombre = models.CharField(max_length=200)  # nombre de la variable meteorológica
-    descripcion = models.CharField(max_length=200)  # Descripción de la variable
+    nombre = models.CharField(max_length=100, unique=True)  # nombre de la variable meteorológica
+    descripcion = models.TextField()  # Descripción de la variable
 
     def __str__(self):
         return self.nombre
@@ -68,6 +72,41 @@ class Dispositivo(models.Model):
     def __str__(self):
         return f'{self.identificador}'
 
+    def subscribe(self):
+        client = mqtt.Client()
+        client.on_message = on_message  # Referencia a la función de manejo de mensajes
+
+        # Conectar al broker
+        client.connect("localhost", 1883, 60)
+
+        # Crear el tema y suscribirse
+        topic = f"dispositivo/{self.identificador}/data"
+        client.subscribe(topic)
+
+        # Iniciar el bucle de escucha
+        client.loop_start()
+
+        print(f"Suscrito a {topic}")
+
+
+def on_message(client, userdata, message):
+    payload = message.payload.decode('utf-8')
+    data = json.loads(payload)
+
+    dispositivo_id = data.get('dispositivo_id')
+    variable_nombre = data.get('variable_nombre')
+    valor = data.get('valor')
+
+    try:
+        dispositivo = Dispositivo.objects.get(identificador=dispositivo_id)
+        variable = Variable.objects.get(nombre=variable_nombre)
+
+        registro = RegistroVariable(dispositivo=dispositivo, variable=variable, valor=valor)
+        registro.save()
+        print(f'Registro guardado: {registro}')
+    except (Dispositivo.DoesNotExist, Variable.DoesNotExist) as e:
+        print(f'Error al guardar registro: {e}')
+
 
 # Modelo para los usuarios
 class Usuario(AbstractUser):
@@ -105,3 +144,10 @@ class RegistroVariable(models.Model):
 
     def __str__(self):
         return f'Registro: {self.dispositivo} - {self.variable} - {self.valor} en {self.timestamp}'
+
+
+# Señales
+@receiver(post_save, sender=Dispositivo)
+def subscribe_to_device(sender, instance, created, **kwargs):
+    if created:
+        instance.subscribe()

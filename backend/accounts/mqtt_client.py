@@ -10,16 +10,19 @@ def on_message(client, userdata, message):
     from .models import RegistroVariable, Dispositivo, Variable  # Importar aquí para evitar la circularidad
     payload = message.payload.decode('utf-8')
     data = json.loads(payload)
+    print(data)
 
     dispositivo_id = data.get('dispositivo_id')
-    variable_id = data.get('variable_id')
+    variable_nombre = data.get('variable_nombre')
+    print(variable_nombre)
     valor = data.get('valor')
 
     try:
         dispositivo = Dispositivo.objects.get(identificador=dispositivo_id)
-        variable = Variable.objects.get(id=variable_id)
+        variable = Variable.objects.get(nombre=variable_nombre)
 
         registro = RegistroVariable(dispositivo=dispositivo, variable=variable, valor=valor)
+        print(registro)
         registro.save()
         print(f'Registro guardado: {registro}')
     except (Dispositivo.DoesNotExist, Variable.DoesNotExist) as e:
