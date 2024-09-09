@@ -43,7 +43,7 @@
     props: {
       title: {
         type: String,
-        default: 'Vue LBD'
+        default: 'Vigía Climático'
       },
       backgroundColor: {
         type: String,

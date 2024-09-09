@@ -17,13 +17,16 @@
     "bootstrap": "^4.6.0",
     "cache-loader": "^4.1.0",
     "chartist": "0.11.0",
+    "file-saver": "^2.0.5",
     "google-maps": "3.2.1",
+    "jspdf": "^2.5.1",
     "leaflet": "^1.9.4",
     "register-service-worker": "1.7.2",
     "v-tooltip": "2.0.0-rc.33",
     "vue": "2.7.14",
     "vue-router": "3.0.2",
-    "vue2-google-maps": "0.10.7"
+    "vue2-google-maps": "0.10.7",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "3.12.1",

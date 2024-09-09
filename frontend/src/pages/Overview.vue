@@ -78,6 +78,13 @@
             <button class="btn btn-warning mt-3" @click="startMonitoring" :disabled="!selectedDevice">
               <i class="fa fa-play"></i> Monitorear
             </button>
+            <!-- Botones de exportación -->
+            <button class="btn btn-primary mt-3" @click="exportToExcel" :disabled="!variables">
+              <i class="fa fa-file-excel-o"></i> Exportar a Excel
+            </button>
+            <button class="btn btn-danger mt-3" @click="exportToPDF" :disabled="!variables">
+              <i class="fa fa-file-pdf-o"></i> Exportar a PDF
+            </button>
 
             <chart-card :chart-data="lineChart.data"
                         :chart-options="lineChart.options"
@@ -102,83 +109,83 @@
           </div>
         </div>
 
-        <div class="col-md-4">
-          <chart-card :chart-data="pieChart.data" chart-type="Pie">
-            <template slot="header">
-              <h4 class="card-title">Email Statistics</h4>
-              <p class="card-category">Last Campaign Performance</p>
-            </template>
-            <template slot="footer">
-              <div class="legend">
-                <i class="fa fa-circle text-info"></i> Open
-                <i class="fa fa-circle text-danger"></i> Bounce
-                <i class="fa fa-circle text-warning"></i> Unsubscribe
-              </div>
-              <hr>
-              <div class="stats">
-                <i class="fa fa-clock-o"></i> Campaign sent 2 days ago
-              </div>
-            </template>
-          </chart-card>
-        </div>
+        <!--        <div class="col-md-4">
+                  <chart-card :chart-data="pieChart.data" chart-type="Pie">
+                    <template slot="header">
+                      <h4 class="card-title">Email Statistics</h4>
+                      <p class="card-category">Last Campaign Performance</p>
+                    </template>
+                    <template slot="footer">
+                      <div class="legend">
+                        <i class="fa fa-circle text-info"></i> Open
+                        <i class="fa fa-circle text-danger"></i> Bounce
+                        <i class="fa fa-circle text-warning"></i> Unsubscribe
+                      </div>
+                      <hr>
+                      <div class="stats">
+                        <i class="fa fa-clock-o"></i> Campaign sent 2 days ago
+                      </div>
+                    </template>
+                  </chart-card>
+                </div>-->
       </div>
 
-      <div class="row">
-        <div class="col-md-6">
-          <chart-card
-            :chart-data="barChart.data"
-            :chart-options="barChart.options"
-            :chart-responsive-options="barChart.responsiveOptions"
-            chart-type="Bar">
-            <template slot="header">
-              <h4 class="card-title">2014 Sales</h4>
-              <p class="card-category">All products including Taxes</p>
-            </template>
-            <template slot="footer">
-              <div class="legend">
-                <i class="fa fa-circle text-info"></i> Tesla Model S
-                <i class="fa fa-circle text-danger"></i> BMW 5 Series
+      <!--      <div class="row">
+              <div class="col-md-6">
+                <chart-card
+                  :chart-data="barChart.data"
+                  :chart-options="barChart.options"
+                  :chart-responsive-options="barChart.responsiveOptions"
+                  chart-type="Bar">
+                  <template slot="header">
+                    <h4 class="card-title">2014 Sales</h4>
+                    <p class="card-category">All products including Taxes</p>
+                  </template>
+                  <template slot="footer">
+                    <div class="legend">
+                      <i class="fa fa-circle text-info"></i> Tesla Model S
+                      <i class="fa fa-circle text-danger"></i> BMW 5 Series
+                    </div>
+                    <hr>
+                    <div class="stats">
+                      <i class="fa fa-check"></i> Data information certified
+                    </div>
+                  </template>
+                </chart-card>
               </div>
-              <hr>
-              <div class="stats">
-                <i class="fa fa-check"></i> Data information certified
-              </div>
-            </template>
-          </chart-card>
-        </div>
 
-        <div class="col-md-6">
-          <card>
-            <template slot="header">
-              <h5 class="title">Tasks</h5>
-              <p class="category">Backend development</p>
-            </template>
-            <l-table :data="tableData.data" :columns="tableData.columns">
-              <template slot="columns"></template>
-              <template slot-scope="{ row }">
-                <td>
-                  <base-checkbox v-model="row.checked"></base-checkbox>
-                </td>
-                <td>{{ row.title }}</td>
-                <td class="td-actions text-right">
-                  <button type="button" class="btn-simple btn btn-xs btn-info" v-tooltip.top-center="editTooltip">
-                    <i class="fa fa-edit"></i>
-                  </button>
-                  <button type="button" class="btn-simple btn btn-xs btn-danger" v-tooltip.top-center="deleteTooltip">
-                    <i class="fa fa-times"></i>
-                  </button>
-                </td>
-              </template>
-            </l-table>
-            <div class="footer">
-              <hr>
-              <div class="stats">
-                <i class="fa fa-history"></i> Updated 3 minutes ago
-              </div>
-            </div>
-          </card>
-        </div>
-      </div>
+      &lt;!&ndash;        <div class="col-md-6">
+                <card>
+                  <template slot="header">
+                    <h5 class="title">Tasks</h5>
+                    <p class="category">Backend development</p>
+                  </template>
+                  <l-table :data="tableData.data" :columns="tableData.columns">
+                    <template slot="columns"></template>
+                    <template slot-scope="{ row }">
+                      <td>
+                        <base-checkbox v-model="row.checked"></base-checkbox>
+                      </td>
+                      <td>{{ row.title }}</td>
+                      <td class="td-actions text-right">
+                        <button type="button" class="btn-simple btn btn-xs btn-info" v-tooltip.top-center="editTooltip">
+                          <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn-simple btn btn-xs btn-danger" v-tooltip.top-center="deleteTooltip">
+                          <i class="fa fa-times"></i>
+                        </button>
+                      </td>
+                    </template>
+                  </l-table>
+                  <div class="footer">
+                    <hr>
+                    <div class="stats">
+                      <i class="fa fa-history"></i> Updated 3 minutes ago
+                    </div>
+                  </div>
+                </card>
+              </div>&ndash;&gt;
+            </div>-->
     </div>
   </div>
 </template>
@@ -187,6 +194,9 @@ import axios from 'axios';
 import ChartCard from 'src/components/Cards/ChartCard.vue';
 import StatsCard from 'src/components/Cards/StatsCard.vue';
 import LTable from 'src/components/Table.vue';
+import XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
 import Chartist from 'chartist';
 
 export default {
@@ -214,7 +224,9 @@ export default {
       variables: {},
       chartData: {}, // Datos del gráfico
       devices: [],  // Lista de dispositivos
-      selectedDevice: null,  // Dispositivo seleccionado
+      selectedDevice: null,
+
+      // Dispositivo seleccionado
       dispositivosCount: 0,
       editTooltip: 'Edit Task',
       deleteTooltip: 'Remove',
@@ -231,7 +243,7 @@ export default {
         },
         options: {
           low: 0,
-          high: 1100,
+          high: 100,
           showArea: false,
           height: '245px',
           axisX: {
@@ -310,13 +322,19 @@ export default {
     async fetchDevices() {
       try {
         const response = await axios.get('http://127.0.0.1:8000/api/user/dispositivos/', {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
-        );
+        });
         this.devices = response.data;
-        console.log('Devices:', JSON.stringify(this.devices, null, 2)); // Imprime la estructura completa
+
+        // Asignar el dispositivo seleccionado desde los parámetros de la ruta
+        if (this.$route.params.selectedDevice) {
+          this.selectedDevice = this.$route.params.selectedDevice;
+          await this.fetchDeviceData(); // Cargar los datos del dispositivo inmediatamente
+        }
+
+        console.log('Devices:', JSON.stringify(this.devices, null, 2));
       } catch (error) {
         console.error('Error fetching devices:', error);
       }
@@ -400,6 +418,89 @@ export default {
         console.error('Error fetching dispositivos count:', error);
       }
     },
+async exportToExcel() {
+  try {
+    const response = await axios.get(`http://127.0.0.1:8000/api/user/dispositivo/${this.selectedDevice}/data/`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    const data = response.data.data; // Accede a los datos
+    console.log('Data from API:', data); // Verifica la estructura de los datos
+
+    // Verifica que data sea un objeto y no esté vacío
+    if (typeof data !== 'object' || data === null || Object.keys(data).length === 0) {
+      console.error('La respuesta no tiene la estructura esperada:', data);
+      return;
+    }
+
+    const formattedData = this.formatDataForExport(data);
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos Meteorológicos');
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    saveAs(blob, 'datos_meteorologicos.xlsx');
+  } catch (error) {
+    console.error('Error exporting to Excel:', error);
+  }
+},
+
+async exportToPDF() {
+  try {
+    const response = await axios.get(`http://127.0.0.1:8000/api/user/dispositivo/${this.selectedDevice}/data/`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    const data = response.data.data; // Obtén los datos
+    const formattedData = this.formatDataForExport(data);
+
+    const doc = new jsPDF();
+    doc.text('Informe de Variables Meteorológicas', 10, 10);
+    let y = 20;
+
+    formattedData.forEach(item => {
+      for (const [key, value] of Object.entries(item)) {
+        doc.text(`${key}: ${value}`, 10, y);
+        y += 10; // Espaciado entre líneas
+      }
+      y += 10; // Espaciado entre dispositivos
+    });
+
+    doc.save('datos_meteorologicos.pdf');
+  } catch (error) {
+    console.error('Error exporting to PDF:', error);
+  }
+},
+
+formatDataForExport(data) {
+  const formattedData = [];
+
+  // Obtiene las etiquetas de la primera variable
+  const firstVariable = Object.values(data)[0];
+  const labels = firstVariable.labels; // Asumimos que todas las variables tienen las mismas etiquetas
+
+  // Itera sobre las etiquetas y crea un objeto para cada una
+  labels.forEach((label, index) => {
+    const row = { Label: label };
+
+    for (const variable in data) {
+      if (data[variable].values[index] !== undefined) {
+        row[variable] = data[variable].values[index]; // Agrega el valor correspondiente
+      } else {
+        row[variable] = 'N/A'; // Manejo de valores nulos
+      }
+    }
+
+    formattedData.push(row);
+  });
+
+  return formattedData;
+}
   }
 }
 </script>

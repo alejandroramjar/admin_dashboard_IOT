@@ -1,83 +1,18 @@
-<!--<template>
-  <gmap-map
-    id="map"
-    :center="center"
-    :zoom="13"
-    :options="options"
-    map-type-id="terrain"
-  >
-    <gmap-marker :position="center">
-    </gmap-marker>
-  </gmap-map>
-</template>-->
 <template>
-  <div id="map" ref="map" />
+  <div class="content">
+    <div class="container-fluid">
+      <card>
+        <div class="row">
+          <div class="col-md-12">
+            <h5>Mapa de Ubicación</h5>
+            <div id="map" ref="map"></div>
+          </div>
+        </div>
+      </card>
+    </div>
+  </div>
 </template>
-<!--<script>
-  import {API_KEY} from './Maps/API_KEY'
-  import Vue from 'vue'
-  import * as VueGoogleMaps from 'vue2-google-maps'
-  Vue.use(VueGoogleMaps, {
-    load: {
-      key: API_KEY
-    }
-  })
-  export default {
-    data () {
-      return {
-        center: {
-          lat: 40.748817,
-          lng: -73.985428
-        },
-        options: {
-          styles: [{
-            'featureType': 'water',
-            'stylers': [{'saturation': 43}, {'lightness': -11}, {'hue': '#0088ff'}]
-          }, {
-            'featureType': 'road',
-            'elementType': 'geometry.fill',
-            'stylers': [{'hue': '#ff0000'}, {'saturation': -100}, {'lightness': 99}]
-          }, {
-            'featureType': 'road',
-            'elementType': 'geometry.stroke',
-            'stylers': [{'color': '#808080'}, {'lightness': 54}]
-          }, {
-            'featureType': 'landscape.man_made',
-            'elementType': 'geometry.fill',
-            'stylers': [{'color': '#ece2d9'}]
-          }, {
-            'featureType': 'poi.park',
-            'elementType': 'geometry.fill',
-            'stylers': [{'color': '#ccdca1'}]
-          }, {
-            'featureType': 'road',
-            'elementType': 'labels.text.fill',
-            'stylers': [{'color': '#767676'}]
-          }, {
-            'featureType': 'road',
-            'elementType': 'labels.text.stroke',
-            'stylers': [{'color': '#ffffff'}]
-          }, {'featureType': 'poi', 'stylers': [{'visibility': 'off'}]}, {
-            'featureType': 'landscape.natural',
-            'elementType': 'geometry.fill',
-            'stylers': [{'visibility': 'on'}, {'color': '#b8cb93'}]
-          }, {'featureType': 'poi.park', 'stylers': [{'visibility': 'on'}]}, {
-            'featureType': 'poi.sports_complex',
-            'stylers': [{'visibility': 'on'}]
-          }, {'featureType': 'poi.medical', 'stylers': [{'visibility': 'on'}]}, {
-            'featureType': 'poi.business',
-            'stylers': [{'visibility': 'simplified'}]
-          }]
-        }
-      }
-    }
-  }
-</script>
-<style>
-  #map {
-    min-height: calc(100vh - 123px);
-  }
-</style>-->
+
 <script>
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -86,38 +21,77 @@ export default {
   data() {
     return {
       center: {
-        lat: 40.748817,
-        lng: -73.985428
+        lat: null,
+        lng: null
       },
-      map: null
+      map: null,
+      type: ['', 'info', 'success', 'warning', 'danger'],
     };
   },
   mounted() {
-    this.lat = this.$route.params.lat; // Obtener latitud de los parámetros de la ruta
-    this.lng = this.$route.params.lng; // Obtener longitud de los parámetros de la ruta
-    this.initMap();
+    const latParam = this.$route.params.lat;
+    const lngParam = this.$route.params.lng;
+
+    if (latParam && lngParam) {
+      this.center.lat = parseFloat(latParam);
+      this.center.lng = parseFloat(lngParam);
+      this.initMap();
+    } else {
+      this.getCurrentLocation(); // Obtener ubicación actual si no hay parámetros
+    }
   },
   methods: {
+    getCurrentLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            this.center.lat = position.coords.latitude;
+            this.center.lng = position.coords.longitude;
+            this.initMap();
+            this.notify('success', 'Ubicación actualizada', 'Se ha actualizado a tu ubicación actual.');
+          },
+          (error) => {
+            console.error('Error obteniendo la ubicación: ', error);
+            this.center.lat = 23.136667; // Ubicación predeterminada
+            this.center.lng = -82.358889; // Ubicación predeterminada
+            this.initMap();
+            this.notify('warning', 'Ubicación predeterminada', 'No se pudo obtener la ubicación, utilizando una ubicación predeterminada.');
+          }
+        );
+      } else {
+        console.error('Geolocalización no es soportada por este navegador.');
+        this.center.lat = 23.136667; // Ubicación predeterminada
+        this.center.lng = -82.358889; // Ubicación predeterminada
+        this.initMap();
+        this.notify('danger', 'Error', 'Geolocalización no soportada, usando ubicación predeterminada.');
+      }
+    },
     initMap() {
-      // Inicializa el mapa
-      this.map = L.map(this.$refs.map).setView([this.center.lat, this.center.lng], 13);
+      this.map = L.map(this.$refs.map).setView([this.center.lat, this.center.lng], 20);
 
-      // Añade la capa de OpenStreetMap
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(this.map);
-      // Crear un icono personalizado (opcional)
-    const markerIcon = L.icon({
-      iconUrl: require('leaflet/dist/images/marker-icon.png'), // Asegúrate de que la ruta sea correcta
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-      shadowSize: [41, 41]
-    });
 
-      // Añade un marcador en el centro
-      L.marker([this.center.lat, this.center.lng], { icon: markerIcon }).addTo(this.map);
+      const markerIcon = L.icon({
+        iconUrl: require('leaflet/dist/images/marker-icon.png'),
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+        shadowSize: [41, 41]
+      });
+
+      L.marker([this.center.lat, this.center.lng], {icon: markerIcon}).addTo(this.map);
+    },
+    notify(type, title, message) {
+      this.$notifications.notify({
+        message: `<span><b>${title}</b> - ${message}</span>`,
+        icon: 'nc-icon nc-app',
+        horizontalAlign: 'center',
+        verticalAlign: 'top',
+        type: type
+      });
     }
   }
 };
