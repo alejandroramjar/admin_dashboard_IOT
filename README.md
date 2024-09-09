@@ -9,6 +9,7 @@ ubicado en la carpeta `frontend` en la raíz del proyecto y el backend está ubi
 - Node.js y npm
 - PostgreSQL server
 - MQTT-Explorer-Setup-0.4.0-beta.6 (Instalar)
+- Mosquitto server
 
 ## Dependencias y Bibliotecas
 ### Backend
