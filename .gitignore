@@ -1,2 +1,5 @@
 *.db
 /backend/db.sqlite3
+MQTT-Explorer-Setup-0.4.0-beta.6.exe
+hs_err_pid33428.log
+sencha-error-20240901.log

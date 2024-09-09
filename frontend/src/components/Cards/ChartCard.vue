@@ -45,7 +45,8 @@
       return {
         chartId: 'no-id',
         $Chartist: null,
-        chart: null
+        chart: null,
+         isChartInitialized: false // Agrega esta variable
       }
     },
     methods: {
@@ -53,7 +54,8 @@
        * Initializes the chart by merging the chart options sent via props and the default chart options
        */
       initChart () {
-        var chartIdQuery = `#${this.chartId}`
+
+       var chartIdQuery = `#${this.chartId}`
         this.chart = this.$Chartist[this.chartType](chartIdQuery, this.chartData, this.chartOptions, this.responsiveOptions)
         this.$emit('initialized', this.chart)
         if (this.chartType === 'Line') {
@@ -62,7 +64,30 @@
         if (this.chartType === 'Bar') {
           this.animateBarChart()
         }
+        if (!this.isChartInitialized) {
+        this.renderChart(); // Llama a la función para renderizar el gráfico
+          this.isChartInitialized = true; // Marca como inicializado
+    }
       },
+      renderChart() {
+    const chartIdQuery = `#${this.chartId}`;
+    this.chart = this.$Chartist[this.chartType](chartIdQuery, this.chartData, this.chartOptions, this.responsiveOptions);
+    this.$emit('initialized', this.chart);
+    if (this.chartType === 'Line') {
+      this.animateLineChart();
+    }
+    if (this.chartType === 'Bar') {
+      this.animateBarChart();
+    }
+  },
+      /***
+   * Actualiza el gráfico con los nuevos datos
+   */
+  updateChart() {
+    if (this.chart) {
+      this.chart.update(this.chartData); // Actualiza el gráfico con los nuevos datos
+    }
+  },
       /***
        * Assigns a random id to the chart
        */

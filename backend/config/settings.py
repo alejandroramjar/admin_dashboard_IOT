@@ -40,7 +40,7 @@ THIRD_APPS = [
 ]
 LOCAL_APPS = [
     'accounts',
-    'iot'
+
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_APPS + LOCAL_APPS
 
@@ -174,3 +174,15 @@ LOGGING = {
         },
     },
 }
+
+
+# ***********************CONFIG EMAIL********************************************
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'koredatatesting@gmail.com'  # koredatatesting@gmail.com
+EMAIL_HOST_PASSWORD = 'audj ucrj qlbk xmon'  # audj ucrj qlbk xmon
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+ADMIN_EMAIL = 'ramjar2107@gmail.com'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# *********************** END CONFIG EMAIL***************************************

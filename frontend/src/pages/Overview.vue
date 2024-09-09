@@ -12,7 +12,7 @@
               <h4 class="card-title">105GB</h4>
             </div>
             <div slot="footer">
-              <i class="fa fa-refresh"></i>Updated now
+              <i class="fa fa-refresh"></i> Updated now
             </div>
           </stats-card>
         </div>
@@ -27,7 +27,7 @@
               <h4 class="card-title">$1,345</h4>
             </div>
             <div slot="footer">
-              <i class="fa fa-calendar-o"></i>Last day
+              <i class="fa fa-calendar-o"></i> Last day
             </div>
           </stats-card>
         </div>
@@ -42,7 +42,7 @@
               <h4 class="card-title">{{ dispositivosCount }}</h4>
             </div>
             <div slot="footer">
-              <i class="fa fa-clock-o"></i>Actual
+              <i class="fa fa-clock-o"></i> Actual
             </div>
           </stats-card>
         </div>
@@ -57,33 +57,49 @@
               <h4 class="card-title">+45</h4>
             </div>
             <div slot="footer">
-              <i class="fa fa-refresh"></i>Updated now
+              <i class="fa fa-refresh"></i> Updated now
             </div>
           </stats-card>
         </div>
-
       </div>
+
       <div class="row">
-        <div class="col-md-8">
-          <chart-card :chart-data="lineChart.data"
-                      :chart-options="lineChart.options"
-                      :responsive-options="lineChart.responsiveOptions">
-            <template slot="header">
-              <h4 class="card-title">Monitoreo en tiempo real</h4>
-              <p class="card-category">Ultimas 24 horas</p>
-            </template>
-            <template slot="footer">
-              <div class="legend">
-                <i class="fa fa-circle text-info"></i> Open
-                <i class="fa fa-circle text-danger"></i> Click
-                <i class="fa fa-circle text-warning"></i> Click Second Time
-              </div>
-              <hr>
-              <div class="stats">
-                <i class="fa fa-history"></i> Actualizado hace {{}} minutos
-              </div>
-            </template>
-          </chart-card>
+        <div class="col-md-12">
+          <div>
+            <div class="form-group">
+              <label for="deviceSelect">Selecciona un dispositivo:</label>
+              <select id="deviceSelect" v-model="selectedDevice" @change="fetchDeviceData" class="form-control">
+                <option value="" disabled selected>Elige un dispositivo</option>
+                <option v-for="device in devices" :key="device.id" :value="device.id">
+                  {{ device.identificador }}
+                </option>
+              </select>
+            </div>
+            <button class="btn btn-warning mt-3" @click="startMonitoring" :disabled="!selectedDevice">
+              <i class="fa fa-play"></i> Monitorear
+            </button>
+
+            <chart-card :chart-data="lineChart.data"
+                        :chart-options="lineChart.options"
+                        :responsive-options="lineChart.responsiveOptions"
+                        ref="chart">
+              <template slot="header">
+                <h4 class="card-title">Monitoreo en tiempo real</h4>
+                <p class="card-category">Últimas 24 horas</p>
+              </template>
+              <template slot="footer">
+                <div v-if="variables" class="legend">
+                  <div v-for="(color, variable) in legendColors" :key="variable">
+                    <i :class="`fa fa-circle ${color}`"></i> {{ variable }}
+                  </div>
+                </div>
+                <hr>
+                <div class="stats">
+                  <i class="fa fa-history"></i> Actualizado hace {{ lastUpdate }} minutos
+                </div>
+              </template>
+            </chart-card>
+          </div>
         </div>
 
         <div class="col-md-4">
@@ -137,11 +153,9 @@
               <h5 class="title">Tasks</h5>
               <p class="category">Backend development</p>
             </template>
-            <l-table :data="tableData.data"
-                     :columns="tableData.columns">
+            <l-table :data="tableData.data" :columns="tableData.columns">
               <template slot="columns"></template>
-
-              <template slot-scope="{row}">
+              <template slot-scope="{ row }">
                 <td>
                   <base-checkbox v-model="row.checked"></base-checkbox>
                 </td>
@@ -163,18 +177,17 @@
               </div>
             </div>
           </card>
-
         </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-import axios from 'axios'
-import ChartCard from 'src/components/Cards/ChartCard.vue'
-import StatsCard from 'src/components/Cards/StatsCard.vue'
-import LTable from 'src/components/Table.vue'
-import Chartist from 'chartist'
+import axios from 'axios';
+import ChartCard from 'src/components/Cards/ChartCard.vue';
+import StatsCard from 'src/components/Cards/StatsCard.vue';
+import LTable from 'src/components/Table.vue';
+import Chartist from 'chartist';
 
 export default {
   components: {
@@ -184,8 +197,25 @@ export default {
   },
   data() {
     return {
+      variableColors: {
+        "Temperatura": "text-info",
+        "Humedad Relativa": "text-danger",
+        "Presión Atmosférica": "text-primary",
+        "Velocidad del Viento": "text-secondary",
+        "Dirección del Viento": "text-warning",
+        "Precipitación": "text-success",
+        "Radiación Solar": "text-light",
+        "Temperatura del Punto de Rocío": "text-dark",
+        "Evaporación": "text-muted",
+        "Índice de Calor": "text-info",
+        "Temperatura del Suelo": "text-danger",
+        "Altitud": "text-primary"
+      },
+      variables: {},
+      chartData: {}, // Datos del gráfico
+      devices: [],  // Lista de dispositivos
+      selectedDevice: null,  // Dispositivo seleccionado
       dispositivosCount: 0,
-      series1: [0, 38, 49, 49, 55, 58, 69, 69],
       editTooltip: 'Edit Task',
       deleteTooltip: 'Remove',
       pieChart: {
@@ -196,16 +226,12 @@ export default {
       },
       lineChart: {
         data: {
-          labels: ['9:00AM', '12:00AM', '3:00PM', '6:00PM', '9:00PM', '12:00PM', '3:00AM', '6:00AM'],
-          series: [
-            [0, 38, 49, 49, 55, 58, 69, 6],
-            [0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0]
-          ]
+          labels: [],
+          series: [[]]
         },
         options: {
           low: 0,
-          high: 150,
+          high: 1100,
           showArea: false,
           height: '245px',
           axisX: {
@@ -223,15 +249,16 @@ export default {
           ['screen and (max-width: 640px)', {
             axisX: {
               labelInterpolationFnc(value) {
-                return value[0]
+                return value[0];
               }
             }
           }]
         ]
       },
+      lastUpdate: 0,
       barChart: {
         data: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
           series: [
             [542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895],
             [412, 243, 280, 580, 453, 353, 300, 364, 368, 410, 636, 695]
@@ -249,7 +276,7 @@ export default {
             seriesBarDistance: 5,
             axisX: {
               labelInterpolationFnc(value) {
-                return value[0]
+                return value[0];
               }
             }
           }]
@@ -265,56 +292,124 @@ export default {
           },
           {title: 'Create 4 Invisible User Experiences you Never Knew About', checked: false},
           {title: 'Read "Following makes Medium better"', checked: false},
-          {title: 'Unfollow 5 enemies from twitter', checked: false}
+          {title: 'Unfollow 5 enemies from Twitter', checked: false}
         ]
       },
       intervalId: null // Para guardar el ID del intervalo
-    }
+    };
   },
   created() {
     this.fetchDispositivosCount();
-    this.startUpdatingChart();
+    this.fetchDevices(); // Cargar dispositivos al inicio
+
   },
   beforeDestroy() {
     clearInterval(this.intervalId); // Limpiar el intervalo al destruir el componente
   },
   methods: {
+    async fetchDevices() {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/user/dispositivos/', {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
+        this.devices = response.data;
+        console.log('Devices:', JSON.stringify(this.devices, null, 2)); // Imprime la estructura completa
+      } catch (error) {
+        console.error('Error fetching devices:', error);
+      }
+    },
+    async fetchDeviceData() {
+      console.log('Selected device in fetchDeviceData:', this.selectedDevice); // Verifica el valor
+      if (!this.selectedDevice) return;
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/api/user/dispositivo/${this.selectedDevice}/data/`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          }
+        );
+        console.log('Device data:', response.data); // verifica en consola que halla datos
+        if (response.data && response.data.data) {
+          this.variables = response.data.data; // Accede al objeto de variables
+          this.prepareColors(); // Llama a la función para preparar colores
+        } else {
+          console.error('No se encontraron datos válidos en la respuesta.');
+        }
+        this.updateChart(response.data); // Actualiza el gráfico con los nuevos datos
+      } catch (error) {
+        console.error('Error fetching device data:', error);
+      }
+    },
+    prepareColors() {
+      const presentVariables = Object.keys(this.variables);
+      this.legendColors = {};
+
+      presentVariables.forEach(variable => {
+        if (this.variableColors[variable]) {
+          this.legendColors[variable] = this.variableColors[variable];
+        }
+      });
+    },
+    updateChart(data) {
+      console.log('Updating chart with data:', data);
+
+      if (data.labels && data.data) {
+        const lastTenLabels = data.labels.slice(-10); // Obtener los últimos 10 labels
+
+        // Prepara las series para el gráfico
+        const seriesData = Object.keys(data.data).map(variable => {
+          return data.data[variable].values.slice(-10); // acceder a .values
+        });
+
+        // Combinar las series en un solo objeto para chartData
+        this.lineChart.data = {
+          labels: lastTenLabels,
+          series: seriesData
+        };
+
+        console.log('Chart Data:', this.lineChart.data);
+
+        // Si estás usando un ref para acceder al componente, puedes llamar a updateChart
+        this.$refs.chart.updateChart();
+
+        this.lastUpdate = 0;
+      } else {
+        console.error('Invalid data structure:', data);
+      }
+    },
+    startMonitoring() {
+      console.log('Starting monitoring for device:', this.selectedDevice); // Verifica el valor
+      this.intervalId = setInterval(() => {
+        console.log('Fetching device data...'); // Verifica si se llama a la función
+        this.fetchDeviceData();
+        this.lastUpdate += 1; // Incrementa el tiempo desde la última actualización
+      }, 10000); // Actualizar cada 60 segundos
+    },
     async fetchDispositivosCount() {
       try {
         const response = await axios.get('http://127.0.0.1:8000/api/user/dispositivos/count/', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
-        })
-        this.dispositivosCount = response.data.count
+        });
+        this.dispositivosCount = response.data.count;
       } catch (error) {
-        console.error('Error fetching dispositivos count:', error)
+        console.error('Error fetching dispositivos count:', error);
       }
     },
-    startUpdatingChart() {
-      this.intervalId = setInterval(() => {
-        this.updateLineChart();
-      }, 6000); // Actualiza cada 6 segundos
-    },
-    updateLineChart() {
-  // Genera nuevos datos aleatorios para el gráfico
-  this.lineChart.data.series.forEach((serie) => {
-    for (let i = 0; i < serie.length; i++) {
-      console.log(serie.length)
-      serie[i] = Math.floor(Math.random() * 100); // Genera un número aleatorio entre 0 y 99
-    }
-  });
-
-  // Actualiza el gráfico con los nuevos datos
-  this.$nextTick(() => {
-    this.chart.upd5
-
-    ate(this.lineChart.data); // Asegúrate de que el método `update` exista
-  });
-}
   }
 }
 </script>
 <style>
+.text-info {
+  color: #17a2b8; /* Color para Temperatura */
+}
+
+.text-danger {
+  color: #dc3545; /* Color para Humedad */
+}
 
 </style>

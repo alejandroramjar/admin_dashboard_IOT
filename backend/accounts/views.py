@@ -6,6 +6,8 @@ from .models import Variable, Provincia, Municipio, Dispositivo, Usuario, Regist
 from .serializer import RegisterSerializer, ProvinciaSerializer, MunicipioSerializer, UsuarioSerializer, \
     DispositivoSerializer, VariableSerializer, ProvinciaSerializer, MunicipioSerializer, DispositivoSerializer, \
     UsuarioSerializer, RegistroVariableSerializer
+from rest_framework import viewsets
+from .models import Dispositivo, RegistroVariable
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -71,6 +73,11 @@ class MunicipioViewSet(viewsets.ModelViewSet):
 class DispositivoViewSet(viewsets.ModelViewSet):
     queryset = Dispositivo.objects.all()
     serializer_class = DispositivoSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Devuelve los dispositivos solo para el usuario autenticado
+        return Dispositivo.objects.filter(user=self.request.user)
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -133,3 +140,36 @@ class UserDispositivosCount(APIView):
         user = request.user
         count = user.dispositivos.count()
         return Response({'count': count})
+
+
+class DispositivoDataViewSet(viewsets.ViewSet):
+    def retrieve(self, request, pk=None):
+        dispositivo = Dispositivo.objects.get(pk=pk)
+
+        # Obtén los registros de las variables del dispositivo (últimos 10)
+        registros = RegistroVariable.objects.filter(dispositivo=dispositivo).order_by('-timestamp')[:20]
+        print(registros.count())
+
+        # Estructura para almacenar los datos
+        data = {}
+
+        # Recorre los registros y agrupa por variable
+        for registro in registros:
+            variable_nombre = registro.variable.nombre  # Asegúrate de tener un campo 'variable' en RegistroVariable
+            timestamp = registro.timestamp.strftime('%H:%M')
+            valor = registro.valor
+
+            if variable_nombre not in data:
+                data[variable_nombre] = {'labels': [], 'values': []}
+
+            data[variable_nombre]['labels'].insert(0, timestamp)  # Insertar al inicio para mantener el orden
+            data[variable_nombre]['values'].insert(0, valor)  # Insertar al inicio para mantener el orden
+
+        # Construye la respuesta
+        response_data = {
+            'labels': data[list(data.keys())[0]]['labels'],  # Usar las etiquetas de la primera variable
+            'data': {variable: values for variable, values in data.items()}
+        }
+        print(response_data)
+
+        return Response(response_data)

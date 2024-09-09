@@ -34,9 +34,11 @@ class MunicipioSerializer(serializers.ModelSerializer):
 
 
 class DispositivoSerializer(serializers.ModelSerializer):
+    variables_dict = serializers.StringRelatedField(many=True, source='variables')
+
     class Meta:
         model = Dispositivo
-        fields = '__all__'
+        fields = ['id', 'protocolo', 'identificador', 'variables_dict', 'descripcion', 'latitud', 'longitud']
 
 
 class UsuarioSerializer(serializers.ModelSerializer):

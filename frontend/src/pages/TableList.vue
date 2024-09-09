@@ -14,6 +14,7 @@
                      :columns="tableColumns"
                      :data="tableData">
             </l-table>
+            <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
           </card>
         </div>
       </div>
@@ -31,10 +32,11 @@ export default {
     LTable,
     Card
   },
-  data () {
+  data() {
     return {
-      tableColumns: ['Protocolo', 'Identificador', 'Descripción', 'Latitud', 'Longitud'],
-      tableData: []
+      tableColumns: ['Protocolo', 'Identificador', 'Variables', 'Descripción', 'Coordenadas'],
+      tableData: [],
+      errorMessage: null
     }
   },
   created() {
@@ -51,16 +53,26 @@ export default {
         this.tableData = response.data.map(dispositivo => ({
           Protocolo: dispositivo.protocolo,
           Identificador: dispositivo.identificador,
+          Variables: Array.isArray(dispositivo.variables_dict)
+            ? dispositivo.variables_dict.join(', ')
+            : JSON.stringify(dispositivo.variables_dict),
           Descripción: dispositivo.descripcion,
           Latitud: dispositivo.latitud,
-          Longitud: dispositivo.longitud
+          Longitud: dispositivo.longitud,
+          Coordenadas: `${dispositivo.latitud}, ${dispositivo.longitud}` // Combinar latitud y longitud
         }))
+        this.errorMessage = null; // Resetear mensaje de error
       } catch (error) {
         console.error('Error fetching dispositivos:', error)
+        this.errorMessage = 'Error al cargar la lista de dispositivos.'
       }
-    }
+    },
+
+},
+
   }
-}
+
+
 </script>
 
 <style>

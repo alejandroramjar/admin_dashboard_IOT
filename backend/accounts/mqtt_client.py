@@ -1,5 +1,7 @@
 import paho.mqtt.client as mqtt
 import json
+from .alerta import enviar_aviso
+from datetime import datetime
 
 
 # Almacenar las suscripciones activas
@@ -7,24 +9,32 @@ active_subscriptions = {}
 
 
 def on_message(client, userdata, message):
-    from .models import RegistroVariable, Dispositivo, Variable  # Importar aquí para evitar la circularidad
+    from .models import RegistroVariable, Dispositivo, Variable
     payload = message.payload.decode('utf-8')
     data = json.loads(payload)
-    print(data)
 
     dispositivo_id = data.get('dispositivo_id')
     variable_nombre = data.get('variable_nombre')
-    print(variable_nombre)
     valor = data.get('valor')
 
     try:
         dispositivo = Dispositivo.objects.get(identificador=dispositivo_id)
         variable = Variable.objects.get(nombre=variable_nombre)
 
-        registro = RegistroVariable(dispositivo=dispositivo, variable=variable, valor=valor)
-        print(registro)
-        registro.save()
-        print(f'Registro guardado: {registro}')
+        # Verifica si ya existe un registro para evitar duplicados
+        if not RegistroVariable.objects.filter(dispositivo=dispositivo, variable=variable, valor=valor, timestamp__date=datetime.today()).exists():
+            registro = RegistroVariable(dispositivo=dispositivo, variable=variable, valor=valor)
+            registro.save()
+
+            # Verificar límites
+            if (variable.limite_superior is not None and valor > variable.limite_superior) or \
+                    (variable.limite_inferior is not None and valor < variable.limite_inferior):
+                enviar_aviso(variable, valor)
+
+            print(f'Registro guardado: {registro}')
+        else:
+            print(f'Registro duplicado: {dispositivo} - {variable} - {valor}')
+
     except (Dispositivo.DoesNotExist, Variable.DoesNotExist) as e:
         print(f'Error al guardar registro: {e}')
 
