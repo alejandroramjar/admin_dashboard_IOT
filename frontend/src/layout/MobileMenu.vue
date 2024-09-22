@@ -4,7 +4,7 @@
       <template slot="title">
         <i class="fa fa-globe"></i>
         <b class="caret"></b>
-        <span class="notification">5 Notifications</span>
+        <span class="notification">4 Notifications</span>
       </template>
       <a class="dropdown-item" href="#">Notification 1</a>
       <a class="dropdown-item" href="#">Notification 2</a>
@@ -15,7 +15,7 @@
     <li class="nav-item">
       <a href="#" class="nav-link">
         <i class="nc-icon nc-zoom-split hidden-lg-up"></i>
-        <span class="d-lg-none">Search</span>
+        <span class="d-lg-none">Busqueda</span>
       </a>
     </li>
     <base-dropdown title="Dropdown">

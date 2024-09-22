@@ -26,30 +26,32 @@
               <b class="caret"></b>
               <span class="notification">5</span>
             </template>
-            <a class="dropdown-item" href="#">Notification 1</a>
-            <a class="dropdown-item" href="#">Notification 2</a>
-            <a class="dropdown-item" href="#">Notification 3</a>
-            <a class="dropdown-item" href="#">Notification 4</a>
-            <a class="dropdown-item" href="#">Another notification</a>
+            <a class="dropdown-item" href="#">Notificación 1</a>
+            <a class="dropdown-item" href="#">Notificación 2</a>
+            <a class="dropdown-item" href="#">Notificación 3</a>
+            <a class="dropdown-item" href="#">Notificación 4</a>
+            <a class="dropdown-item" href="#">Notificación 5</a>
+
           </base-dropdown>
           <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="nc-icon nc-zoom-split"></i>
-              <span class="d-lg-block">&nbsp;Search</span>
+              <span class="d-lg-block">&nbsp;Busqueda</span>
             </a>
           </li>
         </ul>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <a class="nav-link" href="#">
-              Account
+              Cuenta
             </a>
           </li>
-          <base-dropdown title="Dropdown">
-            <a class="dropdown-item" href="#">Action</a>
-            <a class="dropdown-item" href="#">Another action</a>
-            <a class="dropdown-item" href="#">Something</a>
-            <a class="dropdown-item" href="#">Another action</a>
+          <base-dropdown title="Acciones">
+            <a class="dropdown-item" href="#">Acción 1</a>
+            <a class="dropdown-item" href="#">Acción 2</a>
+            <a class="dropdown-item" href="#">Acción 3</a>
+            <a class="dropdown-item" href="#">Acción 4</a>
+            <a class="dropdown-item" href="#">Acción 5</a>
             <a class="dropdown-item" href="#">Something</a>
             <div class="divider"></div>
             <a class="dropdown-item" href="#">Separated link</a>

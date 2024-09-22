@@ -6,31 +6,14 @@
         <i class="nc-icon nc-chart-pie-35"></i>
         <p>Monitoreo</p>
       </sidebar-link>
-      <sidebar-link to="/admin/user">
-        <i class="nc-icon nc-circle-09"></i>
-        <p>Perfil de Usuario</p>
-      </sidebar-link>
       <sidebar-link to="/admin/table-list">
         <i class="nc-icon nc-vector"></i>
         <p>Mis dispositivos</p>
-      </sidebar-link>
-      <sidebar-link to="/admin/typography">
-        <i class="nc-icon nc-paper-2"></i>
-        <p>Typography</p>
-      </sidebar-link>
-      <sidebar-link to="/admin/icons">
-        <i class="nc-icon nc-atom"></i>
-        <p>Icons</p>
       </sidebar-link>
       <sidebar-link to="/admin/maps">
         <i class="nc-icon nc-pin-3"></i>
         <p>Mapa y Ubicaciones</p>
       </sidebar-link>
-      <sidebar-link to="/admin/notifications">
-        <i class="nc-icon nc-bell-55"></i>
-        <p>Notifications</p>
-      </sidebar-link>
-
     </side-bar>
     <div class="main-panel">
       <top-navbar></top-navbar>
