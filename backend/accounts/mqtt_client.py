@@ -2,6 +2,8 @@ import paho.mqtt.client as mqtt
 import json
 from .alerta import enviar_aviso
 from datetime import datetime
+import time
+import threading
 
 
 # Almacenar las suscripciones activas
@@ -46,6 +48,20 @@ def subscribe_to_device(client, dispositivo_id):
     print(f'Suscrito al tema: {topic}')
     active_subscriptions[dispositivo_id] = topic
 
+def check_for_new_devices(client):
+    while True:
+        # Verificar y suscribirse a nuevos dispositivos
+        from .models import Dispositivo
+        dispositivos_existentes = {d.identificador for d in Dispositivo.objects.all()}
+
+        # Suscribirse a dispositivos que no están actualmente suscritos
+        for dispositivo_id in dispositivos_existentes:
+            if dispositivo_id not in active_subscriptions:
+                subscribe_to_device(client, dispositivo_id)
+
+        # Esperar 5 segundos antes de verificar de nuevo
+        time.sleep(5)
+
 
 def start_mqtt_client():
     from .models import Dispositivo
@@ -57,3 +73,6 @@ def start_mqtt_client():
     # Suscribirse a los dispositivos existentes al iniciar
     for dispositivo in Dispositivo.objects.all():
         subscribe_to_device(client, dispositivo.identificador)
+        
+    # Iniciar el hilo para verificar nuevos dispositivos
+    threading.Thread(target=check_for_new_devices, args=(client,), daemon=True).start()
