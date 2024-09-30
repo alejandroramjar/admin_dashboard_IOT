@@ -77,54 +77,54 @@ class Dispositivo(models.Model):
     def variables_dict(self):
         return json.loads(self.variables.__str__())
 
-#     def subscribe(self):
-#         client = mqtt.Client()
-#         client.on_message = on_message  # Referencia a la función de manejo de mensajes
-#
-#         # Conectar al broker
-#         client.connect("localhost", 1883, 60)
-#
-#         # Crear el tema y suscribirse
-#         topic = f"dispositivo/{self.identificador}/data"
-#         client.subscribe(topic)
-#
-#         # Iniciar el bucle de escucha
-#         client.loop_start()
-#
-#         print(f"Suscrito a {topic}")
-#
-#
-# def on_message(client, userdata, message):
-#     from datetime import datetime
-#     from .alerta import enviar_aviso
-#     payload = message.payload.decode('utf-8')
-#     data = json.loads(payload)
-#
-#     dispositivo_id = data.get('dispositivo_id')
-#     variable_nombre = data.get('variable_nombre')
-#     valor = data.get('valor')
-#
-#     try:
-#         dispositivo = Dispositivo.objects.get(identificador=dispositivo_id)
-#         variable = Variable.objects.get(nombre=variable_nombre)
-#
-#         # Verifica si ya existe un registro para evitar duplicados
-#         if not RegistroVariable.objects.filter(dispositivo=dispositivo, variable=variable, valor=valor,
-#                                                timestamp__date=datetime.today()).exists():
-#             registro = RegistroVariable(dispositivo=dispositivo, variable=variable, valor=valor)
-#             registro.save()
-#
-#             # Verificar límites
-#             if (variable.limite_superior is not None and valor > variable.limite_superior) or \
-#                     (variable.limite_inferior is not None and valor < variable.limite_inferior):
-#                 enviar_aviso(variable, valor)
-#
-#             print(f'Registro guardado: {registro}')
-#         else:
-#             print(f'Registro duplicado: {dispositivo} - {variable} - {valor}')
-#
-#     except (Dispositivo.DoesNotExist, Variable.DoesNotExist) as e:
-#         print(f'Error al guardar registro: {e}')
+    def subscribe(self):
+        client = mqtt.Client()
+        client.on_message = on_message  # Referencia a la función de manejo de mensajes
+
+        # Conectar al broker
+        client.connect("localhost", 1883, 60)
+
+        # Crear el tema y suscribirse
+        topic = f"dispositivo/{self.identificador}/data"
+        client.subscribe(topic)
+
+        # Iniciar el bucle de escucha
+        client.loop_start()
+
+        print(f"Suscrito a {topic}")
+
+####
+def on_message(client, userdata, message):
+    from datetime import datetime
+    from .alerta import enviar_aviso
+    payload = message.payload.decode('utf-8')
+    data = json.loads(payload)
+
+    dispositivo_id = data.get('dispositivo_id')
+    variable_nombre = data.get('variable_nombre')
+    valor = data.get('valor')
+
+    try:
+        dispositivo = Dispositivo.objects.get(identificador=dispositivo_id)
+        variable = Variable.objects.get(nombre=variable_nombre)
+
+        # Verifica si ya existe un registro para evitar duplicados
+        if not RegistroVariable.objects.filter(dispositivo=dispositivo, variable=variable, valor=valor,
+                                               timestamp__date=datetime.today()).exists():
+            registro = RegistroVariable(dispositivo=dispositivo, variable=variable, valor=valor)
+            registro.save()
+
+            # Verificar límites
+            if (variable.limite_superior is not None and valor > variable.limite_superior) or \
+                    (variable.limite_inferior is not None and valor < variable.limite_inferior):
+                enviar_aviso(variable, valor)
+
+            print(f'Registro guardado: {registro}')
+        else:
+            print(f'Registro duplicado: {dispositivo} - {variable} - {valor}')
+
+    except (Dispositivo.DoesNotExist, Variable.DoesNotExist) as e:
+        print(f'Error al guardar registro: {e}')
 
 
 # Modelo para los usuarios
