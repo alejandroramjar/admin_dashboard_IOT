@@ -2,6 +2,11 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import Provincia, Municipio, Usuario, Variable, Dispositivo, RegistroVariable
 
+admin.site.site_header = 'Vigia Climático'
+admin.site.index_title = 'Panel de control'
+admin.site.site_title = 'Administrador de datos'
+admin.site.site_url = 'http://localhost:8082/#/admin/maps' # direccion del frontend(puerto del frontend), debe ser modificado siempre para el frontend.
+
 
 # Registro del modelo Provincia en el panel de administración
 @admin.register(Provincia)

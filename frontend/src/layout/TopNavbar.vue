@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">Dashboard</a>
+      <a v-if="checkifadmin" class="navbar-brand nav-link" @click="admin" href="#">Admin site</a>
       <button type="button"
               class="navbar-toggler navbar-toggler-right"
               :class="{toggled: $sidebar.showSidebar}"
@@ -14,32 +14,7 @@
         <span class="navbar-toggler-bar burger-lines"></span>
       </button>
       <div class="collapse navbar-collapse justify-content-end">
-        <ul class="nav navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#" data-toggle="dropdown">
-              <i class="nc-icon nc-palette"></i>
-            </a>
-          </li>
-          <base-dropdown tag="li">
-            <template slot="title">
-              <i class="nc-icon nc-planet"></i>
-              <b class="caret"></b>
-              <span class="notification">5</span>
-            </template>
-            <a class="dropdown-item" href="#">Notificación 1</a>
-            <a class="dropdown-item" href="#">Notificación 2</a>
-            <a class="dropdown-item" href="#">Notificación 3</a>
-            <a class="dropdown-item" href="#">Notificación 4</a>
-            <a class="dropdown-item" href="#">Notificación 5</a>
 
-          </base-dropdown>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="nc-icon nc-zoom-split"></i>
-              <span class="d-lg-block">&nbsp;Busqueda</span>
-            </a>
-          </li>
-        </ul>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <a class="nav-link" href="#">
@@ -63,42 +38,47 @@
   </nav>
 </template>
 <script>
-  export default {
-    computed: {
-      routeName () {
-        const {name} = this.$route
-        return this.capitalizeFirstLetter(name)
-      }
-    },
-    data () {
-      return {
-        activeNotifications: false
-      }
-    },
-    methods: {
-      async logout() {
-    localStorage.removeItem('token');
-    this.$router.push('/login');
-  },
-      capitalizeFirstLetter (string) {
-        return string.charAt(0).toUpperCase() + string.slice(1)
-      },
-      toggleNotificationDropDown () {
-        this.activeNotifications = !this.activeNotifications
-      },
-      closeDropDown () {
-        this.activeNotifications = false
-      },
-      toggleSidebar () {
-        this.$sidebar.displaySidebar(!this.$sidebar.showSidebar)
-      },
-      hideSidebar () {
-        this.$sidebar.displaySidebar(false)
-      }
-    }
-  }
+import axios from 'axios';
 
+export default {
+  data() {
+    return {
+      activeNotifications: false,
+      checkifadmin: false  // Cambiado a data()
+    };
+  },
+  async created() {
+    const token = localStorage.getItem('token');
+    this.checkifadmin = await this.checkIfAdmin(token);  // Llamar a la función en el ciclo de vida
+  },
+  methods: {
+    async checkIfAdmin(token) {
+      try {
+        const response = await axios.get('http://localhost:8000/apis/user/', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        return response.data.is_admin;  // true si es admin, false en caso contrario
+      } catch (error) {
+        console.error('Error al verificar el rol del usuario:', error);
+        return false;
+      }
+    },
+    async logout() {
+      localStorage.removeItem('token');
+      this.$router.push('/login');
+    },
+    async admin() {
+      window.location.href = 'http://localhost:8000/admin/';
+    },
+    toggleSidebar() {
+      this.$sidebar.displaySidebar(!this.$sidebar.showSidebar);
+    },
+  }
+}
 </script>
+
 <style>
 
 </style>

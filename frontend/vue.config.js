@@ -6,7 +6,13 @@ function resolveSrc(_path) {
 }
 
 module.exports = {
-  lintOnSave: false,
+    lintOnSave: false,
+   devServer: {
+        host: 'localhost', // Solo accesible desde localhost
+        port: 8082, // Asegúrate de que el puerto sea el mismo
+        disableHostCheck: true, // Desactiva la verificación del host
+    },
+
   configureWebpack: {
     // Set up all the aliases we use in our app.
     resolve: {

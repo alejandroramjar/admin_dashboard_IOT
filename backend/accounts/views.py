@@ -13,10 +13,23 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import generics
 from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 
 
-# Create your views here.
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+class UserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            'username': user.username,
+            'is_admin': user.is_staff,  # o user.is_superuser
+        })
 
 class RegistroUsuario(generics.CreateAPIView):
     queryset = Usuario.objects.all()
@@ -24,23 +37,33 @@ class RegistroUsuario(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
 
-        user = serializer.save()
-        user.is_active = True  # Establecer el usuario como inactivo
-        user.save()
+            user = serializer.save()
+            user.is_active = True  # Establecer el usuario como inactivo
+            user.save()
 
-        # Enviar correo electrónico al usuario
-        # self.send_registration_email(user)
+            # Enviar correo electrónico al usuario
+            # self.send_registration_email(user)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class ProvinciaList(generics.ListAPIView):
+    permission_classes = [AllowAny]
+    queryset = Provincia.objects.all()
+    serializer_class = ProvinciaSerializer
 
 
 class ProvinciaViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
     queryset = Provincia.objects.all()
     serializer_class = ProvinciaSerializer
-    permission_classes = [AllowAny]
 
 
 class MunicipioViewSet(viewsets.ModelViewSet):
@@ -54,21 +77,11 @@ class MunicipioViewSet(viewsets.ModelViewSet):
             return self.queryset.filter(provincia_id=provincia_id)
         return self.queryset
 
-class VariableViewSet(viewsets.ModelViewSet):
-    queryset = Variable.objects.all()
-    serializer_class = VariableSerializer
 
 class VariableViewSet(viewsets.ModelViewSet):
     queryset = Variable.objects.all()
     serializer_class = VariableSerializer
 
-class ProvinciaViewSet(viewsets.ModelViewSet):
-    queryset = Provincia.objects.all()
-    serializer_class = ProvinciaSerializer
-
-class MunicipioViewSet(viewsets.ModelViewSet):
-    queryset = Municipio.objects.all()
-    serializer_class = MunicipioSerializer
 
 class DispositivoViewSet(viewsets.ModelViewSet):
     queryset = Dispositivo.objects.all()
@@ -79,13 +92,16 @@ class DispositivoViewSet(viewsets.ModelViewSet):
         # Devuelve los dispositivos solo para el usuario autenticado
         return Dispositivo.objects.filter(user=self.request.user)
 
+
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
 
+
 class RegistroVariableViewSet(viewsets.ModelViewSet):
     queryset = RegistroVariable.objects.all()
     serializer_class = RegistroVariableSerializer
+
 
 #    def send_registration_email(self, user):
 #        try:
@@ -107,11 +123,6 @@ class RegistroVariableViewSet(viewsets.ModelViewSet):
 #            logger.error(f"Error al enviar correos: {e}")
 
 
-class UsuarioViewSet(viewsets.ModelViewSet):
-    queryset = Usuario.objects.all()
-    serializer_class = UsuarioSerializer
-
-
 @api_view(['POST'])
 def register(request):
     serializer = UsuarioSerializer(data=request.data)
@@ -119,9 +130,6 @@ def register(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# views.py
 
 
 class UserDispositivosList(generics.ListAPIView):

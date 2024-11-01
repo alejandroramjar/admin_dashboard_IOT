@@ -152,7 +152,7 @@ import axios from 'axios';
 import ChartCard from 'src/components/Cards/ChartCard.vue';
 import StatsCard from 'src/components/Cards/StatsCard.vue';
 import LTable from 'src/components/Table.vue';
-import XLSX from 'xlsx';
+import * as XLSX from  'xlsx';
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 import Chartist from 'chartist';
@@ -279,7 +279,7 @@ export default {
   methods: {
     async fetchDevices() {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/user/dispositivos/', {
+        const response = await axios.get('http://127.0.0.1:8000/apis/user/dispositivos/', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -301,7 +301,7 @@ export default {
       console.log('Selected device in fetchDeviceData:', this.selectedDevice); // Verifica el valor
       if (!this.selectedDevice) return;
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/api/user/dispositivo/${this.selectedDevice}/data/`, {
+        const response = await axios.get(`http://127.0.0.1:8000/apis/user/dispositivo/${this.selectedDevice}/data/`, {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
@@ -366,7 +366,7 @@ export default {
     },
     async fetchDispositivosCount() {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/user/dispositivos/count/', {
+        const response = await axios.get('http://127.0.0.1:8000/apis/user/dispositivos/count/', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -378,7 +378,7 @@ export default {
     },
 async exportToExcel() {
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/api/user/dispositivo/${this.selectedDevice}/data/`, {
+    const response = await axios.get(`http://127.0.0.1:8000/apis/user/dispositivo/${this.selectedDevice}/data/`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }
@@ -408,7 +408,7 @@ async exportToExcel() {
 
 async exportToPDF() {
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/api/user/dispositivo/${this.selectedDevice}/data/`, {
+    const response = await axios.get(`http://127.0.0.1:8000/apis/user/dispositivo/${this.selectedDevice}/data/`, {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`
       }

@@ -7,38 +7,63 @@
           <div class="row mb-3">
             <div class="col">
               <label for="first_name" class="form-label">Nombre(s)</label>
-              <input type="text" class="form-control" id="first_name" v-model="first_name" required>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fa fa-user"></i>
+                </span>
+                <input type="text" class="form-control" id="first_name" v-model="first_name" required>
+              </div>
             </div>
             <div class="col">
               <label for="last_name" class="form-label">Apellidos</label>
-              <input type="text" class="form-control" id="last_name" v-model="last_name" required>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fa fa-user"></i>
+                </span>
+                <input type="text" class="form-control" id="last_name" v-model="last_name" required>
+              </div>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
               <label for="username" class="form-label">Nombre de Usuario</label>
-              <input type="text" class="form-control" id="username" v-model="username" required>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fa fa-at"></i>
+                </span>
+                <input type="text" class="form-control" id="username" v-model="username" required>
+              </div>
             </div>
             <div class="col">
               <label for="email" class="form-label">Correo Electrónico</label>
-              <input type="email" class="form-control" id="email" v-model="email" required>
+              <div class="input-group mb-3">
+                <span class="input-group-text">
+                  <i class="fa fa-envelope"></i>
+                </span>
+                <input type="email" class="form-control" id="email" v-model="email" required>
+              </div>
             </div>
           </div>
           <div class="row mb-3">
-            <div class="col">
+            <div class="col-5">
               <label for="carnet_identidad" class="form-label">Carnet de Identidad</label>
               <input type="number" class="form-control" id="carnet_identidad" v-model="carnet_identidad" required>
             </div>
-            <div class="col">
+            <div class="col-7">
               <label for="phone" class="form-label">Teléfono</label>
-              <input type="number" class="form-control" id="phone" v-model="phone" required>
+              <div class="input-group mb-3">
+                <span class="input-group-text">
+                  <i class="fa fa-phone"></i> +53
+                </span>
+                <input type="number" class="form-control" id="phone" v-model="phone" required>
+              </div>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col">
               <label for="provincia" class="form-label">Provincia</label>
               <select class="form-control" id="provincia" v-model="provincia" @change="fetchMunicipios" required>
-                <option v-for="prov in provincias" :key="prov.id" :value="prov.id">{{ prov.nombre }}</option>
+                <option v-for="prov in provincias" :key="prov.id" :value="prov.id" style="color: #0e0e0e">{{ prov.nombre }}</option>
               </select>
             </div>
             <div class="col">
@@ -51,11 +76,21 @@
           <div class="row mb-3">
             <div class="col">
               <label for="password" class="form-label">Contraseña</label>
-              <input type="password" class="form-control" id="password" v-model="password" required>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fa fa-lock"></i>
+                </span>
+                <input type="password" class="form-control" id="password" v-model="password" required>
+              </div>
             </div>
             <div class="col">
               <label for="password2" class="form-label">Confirmar Contraseña</label>
-              <input type="password" class="form-control" id="password2" v-model="password2" required>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fa fa-lock"></i>
+                </span>
+                <input type="password" class="form-control" id="password2" v-model="password2" required>
+              </div>
             </div>
           </div>
           <div class="d-grid gap-2">
@@ -101,8 +136,9 @@ export default {
   },
   methods: {
     async fetchProvincias() {
+      console.log(this.provincias)
       try {
-        const response = await axios.get('http://localhost:8000/api/provincias/');
+        const response = await axios.get('http://localhost:8000/apis/provincias/');
         this.provincias = response.data;
       } catch (error) {
         console.error('Error fetching provincias:', error);
@@ -110,7 +146,7 @@ export default {
     },
     async fetchMunicipios() {
       try {
-        const response = await axios.get(`http://localhost:8000/api/municipios/?provincia=${this.provincia}`);
+        const response = await axios.get(`http://localhost:8000/apis/municipios/?provincia=${this.provincia}`);
         this.municipios = response.data;
       } catch (error) {
         console.error('Error fetching municipios:', error);
@@ -119,6 +155,14 @@ export default {
     async register() {
       if (this.password !== this.password2) {
         alert("Las contraseñas no coinciden");
+        return;
+      }
+      else if (!/^\d{8}$/.test(this.phone)) {
+        alert("El teléfono debe tener exactamente 8 dígitos.");
+        return;
+      }
+      else if (!/^\d{11}$/.test(this.carnet_identidad)) {
+        alert("El carnet de identidad debe tener exactamente 11 dígitos.");
         return;
       }
 
@@ -137,7 +181,7 @@ export default {
       try {
         this.loading = true;
         console.log(formData);
-        const response = await axios.post('http://localhost:8000/api/register/', formData);
+        const response = await axios.post('http://localhost:8000/apis/register/', formData);
         console.log(response);
         this.loading = false;
 
@@ -206,5 +250,10 @@ export default {
   border-color: #6c757d;
 }
 
+select {
+  color: #000; /* Color del texto */
+  background-color: #fff; /* Color de fondo */
+  border: 1px solid #ced4da; /* Borde estándar */
+}
 
 </style>

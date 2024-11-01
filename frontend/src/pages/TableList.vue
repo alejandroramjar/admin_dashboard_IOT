@@ -14,6 +14,7 @@
                      :columns="tableColumns"
                      :data="tableData">
             </l-table>
+            <p v-if="!tableData[0]" class="error-message">No hay dispositivos asociados</p>
             <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
           </card>
         </div>
@@ -45,7 +46,7 @@ export default {
   methods: {
     async fetchDispositivos() {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/user/dispositivos/', {
+        const response = await axios.get('http://127.0.0.1:8000/apis/user/dispositivos/', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }

@@ -37,6 +37,7 @@ class LogURLMiddleware:
 
         # Registrar la URL solicitada y la IP del cliente
         logger.info(f"URL solicitada: {request.path} desde IP: {ip}")
+        print(ip)
 
         response = self.get_response(request)
         return response

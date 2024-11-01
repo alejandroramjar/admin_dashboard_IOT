@@ -7,9 +7,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = Usuario
         fields = ['username', 'email', 'password', 'first_name', 'last_name', 'municipio',
                   'carnet_identidad', 'phone']
+        extra_kwargs = {
+            'password': {'write_only': True}  # La contraseña no se debe devolver en las respuestas
+        }
 
     def create(self, validated_data):
         user = Usuario(**validated_data)
+        user.set_password(validated_data['password'])  # Asegúrate de almacenar la contraseña de manera segura
         user.is_active = True
         user.save()
         return user

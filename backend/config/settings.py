@@ -12,7 +12,10 @@ DEBUG = True
 # Application definition
 
 DJANGO_APPS = [
+    'jet.dashboard',
     'jet',
+    'corsheaders',
+    'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -28,7 +31,7 @@ THIRD_APPS = [
     # 'rest_auth',
     # 'rest_auth.registration',
     # 'rest_framework.authtoken',
-    'corsheaders',
+
     # 'jet',
     # 'dj_rest_auth',
     # 'dj_rest_auth.registration',
@@ -79,10 +82,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middelware.LogURLMiddleware',  # middleware para registro de solicitudes y eventos por dirección e IP
+
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'http://127.0.0.1:8080',
+    'http://127.0.0.1:8082',
+    'http://localhost:8082',
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -142,38 +147,38 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'debug.log'),
-        },
-        'console': {
-            'level': 'INFO',  # Cambia a INFO para reducir la cantidad de logs
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['file', 'console'],
-        'level': 'DEBUG',
-        'propagate': False,
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file', 'console'],  # Incluye la consola para ver los logs en tiempo real
-            'level': 'DEBUG',  # Cambia a INFO para reducir la cantidad de logs
-            'propagate': True,
-        },
-        'django.request': {
-            'handlers': ['file', 'console'],
-            'level': 'DEBUG',  # Cambia a INFO para reducir la cantidad de logs
-            'propagate': False,
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': True,
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'filename': os.path.join(BASE_DIR, 'debug.log'),
+#         },
+#         'console': {
+#             'level': 'INFO',  # Cambia a INFO para reducir la cantidad de logs
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'root': {
+#         'handlers': ['file', 'console'],
+#         'level': 'DEBUG',
+#         'propagate': True,
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file', 'console'],  # Incluye la consola para ver los logs en tiempo real
+#             'level': 'DEBUG',  # Cambia a INFO para reducir la cantidad de logs
+#             'propagate': True,
+#         },
+#         'django.request': {
+#             'handlers': ['file', 'console'],
+#             'level': 'DEBUG',  # Cambia a INFO para reducir la cantidad de logs
+#             'propagate': True,
+#         },
+#     },
+# }
 
 
 # ***********************CONFIG EMAIL********************************************
@@ -186,3 +191,11 @@ EMAIL_USE_TLS = True
 ADMIN_EMAIL = 'ramjar2107@gmail.com'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # *********************** END CONFIG EMAIL***************************************
+JET_DEFAULT_THEME = 'light-gray'
+JET_SIDE_MENU_COMPACT = False
+JET_CHANGE_FORM_SIBLING_LINKS = True
+JET_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultIndexDashboard'
+JET_APP_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultAppIndexDashboard'
+
+
+SITE_ID = 1
