@@ -29,7 +29,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class VariableSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variable

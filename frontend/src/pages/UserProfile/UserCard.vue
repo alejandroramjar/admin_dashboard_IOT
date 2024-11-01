@@ -11,7 +11,7 @@
       </a>
     </div>
     <p class="description text-center"> telefono: +53{{user.phone}} <br>
-      correo: {{user.email}} <br>
+      <span>Correo:</span> {{user.email}} <br>
       Municipio: {{municipio.nombre}}
     </p>
     <div slot="footer" class="text-center d-flex justify-content-center">

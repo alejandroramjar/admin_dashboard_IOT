@@ -17,20 +17,11 @@
 
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="#" @click="cuenta">
               Cuenta
             </a>
           </li>
-          <base-dropdown title="Acciones">
-            <a class="dropdown-item" href="#">Acción 1</a>
-            <a class="dropdown-item" href="#">Acción 2</a>
-            <a class="dropdown-item" href="#">Acción 3</a>
-            <a class="dropdown-item" href="#">Acción 4</a>
-            <a class="dropdown-item" href="#">Acción 5</a>
-            <a class="dropdown-item" href="#">Something</a>
-            <div class="divider"></div>
-            <a class="dropdown-item" href="#">Separated link</a>
-          </base-dropdown>
+
           <li class="nav-item"><a @click="logout" href="#" class="nav-link"> Cerrar Sesión</a></li>
         </ul>
       </div>
@@ -44,7 +35,7 @@ export default {
   data() {
     return {
       activeNotifications: false,
-      checkifadmin: false  // Cambiado a data()
+      checkifadmin: false
     };
   },
   async created() {
@@ -68,6 +59,9 @@ export default {
     async logout() {
       localStorage.removeItem('token');
       this.$router.push('/login');
+    },
+    async cuenta() {
+      this.$router.push('/admin/user');
     },
     async admin() {
       window.location.href = 'http://localhost:8000/admin/';

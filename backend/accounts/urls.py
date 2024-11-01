@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import RegistroUsuario, ProvinciaViewSet, MunicipioViewSet, UserDispositivosList, UserDispositivosCount, \
     VariableViewSet, ProvinciaViewSet, MunicipioViewSet, DispositivoViewSet, UsuarioViewSet, RegistroVariableViewSet, \
-    DispositivoDataViewSet, ProvinciaList, UserView, UsuarioDetail, UsuarioDetailMunicipio
+    DispositivoDataViewSet, ProvinciaList, UserView, UsuarioDetail, UsuarioDetailMunicipio, DispositivoList
 
 router = DefaultRouter()
 app_name = 'accounts'
@@ -20,6 +20,7 @@ urlpatterns = [
     path('user/', UserView.as_view(), name='user-info'),
     path('userD/', UsuarioDetail.as_view(), name='user-detail'),
     path('userD/municipio', UsuarioDetailMunicipio.as_view(), name='user-detail-municipio'),
+    path('api/dispositivos/', DispositivoList.as_view(), name='dispositivo-list'),
     #path('provincias_/', ProvinciaList.as_view(), name='provincias_list'),
     path('user/dispositivos/', UserDispositivosList.as_view(), name='user-dispositivos'),
     path('user/dispositivo/<int:pk>/data/', DispositivoDataViewSet.as_view({'get': 'retrieve'}), name='dispositivo-data'),

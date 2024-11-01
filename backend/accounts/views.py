@@ -22,6 +22,10 @@ from .serializer import UsuarioSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import generics, permissions
+from .models import Dispositivo
+from .serializer import DispositivoSerializer
+
 
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
@@ -32,6 +36,7 @@ class UserView(APIView):
             'username': user.username,
             'is_admin': user.is_staff,  # o user.is_superuser
         })
+
 
 class RegistroUsuario(generics.CreateAPIView):
     queryset = Usuario.objects.all()
@@ -53,7 +58,6 @@ class RegistroUsuario(generics.CreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except ValidationError as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class ProvinciaList(generics.ListAPIView):
@@ -185,7 +189,6 @@ class DispositivoDataViewSet(viewsets.ViewSet):
         return Response(response_data)
 
 
-
 class UsuarioDetail(generics.RetrieveUpdateAPIView):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
@@ -211,3 +214,15 @@ class UsuarioDetailMunicipio(generics.RetrieveUpdateAPIView):
             return user.municipio  # Devuelve el objeto Municipio asociado al usuario
         else:
             return Response("Municipio no encontrado para el usuario autenticado.")
+
+
+class DispositivoList(generics.ListAPIView):
+    queryset = Dispositivo.objects.all()
+    serializer_class = DispositivoSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:  # Verifica si es un administrador
+            return Dispositivo.objects.all()  # Devuelve todos los dispositivos
+        return user.dispositivos.all()  # Devuelve solo los dispositivos asociados al usuario
