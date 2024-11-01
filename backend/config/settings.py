@@ -197,5 +197,8 @@ JET_CHANGE_FORM_SIBLING_LINKS = True
 JET_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultIndexDashboard'
 JET_APP_INDEX_DASHBOARD = 'jet.dashboard.dashboard.DefaultAppIndexDashboard'
 
-
+from decouple import config
 SITE_ID = 1
+DJANGO_HOST = config('DJANGO_HOST', default='127.0.0.1')
+DJANGO_PORT = config('DJANGO_PORT', default='8000')
+FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:8082')

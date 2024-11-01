@@ -24,7 +24,7 @@
       <div class="row">
         <div class="col-md-12">
           <div>
-            <div class="form-group">
+            <div class="form-group" v-if="devices[0]">
               <label for="deviceSelect">Selecciona un dispositivo para monitorear:</label>
               <select id="deviceSelect" v-model="selectedDevice" @change="fetchDeviceData" class="form-control">
                 <option value="" disabled selected>Elige un dispositivo</option>
@@ -32,6 +32,10 @@
                   {{ device.identificador }}
                 </option>
               </select>
+            </div>
+            <div class="form-group" v-if="!devices[0]">
+              <p>No tienes dispositivos asociados</p>
+
             </div>
             <button class="btn btn-warning mt-3" @click="startMonitoring" :disabled="!selectedDevice">
               <i class="fa fa-play"></i> Monitorear

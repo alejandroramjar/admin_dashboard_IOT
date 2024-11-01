@@ -72,6 +72,9 @@ class Usuario(AbstractUser):
     def __str__(self):
         return self.get_full_name()
 
+    def get_municipio(self):
+        return self.municipio.nombre
+
     def get_provincia(self):
         if self.municipio:
             return self.municipio.provincia

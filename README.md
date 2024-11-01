@@ -91,6 +91,9 @@ ubicado en la carpeta `frontend` en la raíz del proyecto y el backend está ubi
     DB_PASSWORD=password
     DB_HOST=localhost
     DB_PORT=5433
+    DJANGO_HOST=0.0.0.0                  # O 'localhost' si solo se accede localmente
+    DJANGO_PORT=8000                     # Puerto donde se ejecutará Django
+    FRONTEND_URL=http://localhost:8080   # URL de tu aplicación Vue.js en desarrollo
     ```
 
 5. Realiza las migraciones de la base de datos y se crea el súper usuario:

@@ -6,6 +6,10 @@
         <i class="nc-icon nc-chart-pie-35"></i>
         <p>Monitoreo</p>
       </sidebar-link>
+      <sidebar-link to="/admin/user">
+        <i class="nc-icon nc-circle-09"></i>
+        <p>User Profile</p>
+      </sidebar-link>
       <sidebar-link to="/admin/table-list">
         <i class="nc-icon nc-vector"></i>
         <p>Mis dispositivos</p>

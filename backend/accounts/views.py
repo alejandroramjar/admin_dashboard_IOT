@@ -15,7 +15,9 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework import generics, permissions
+from .models import Usuario
+from .serializer import UsuarioSerializer
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -181,3 +183,31 @@ class DispositivoDataViewSet(viewsets.ViewSet):
         print(response_data)
 
         return Response(response_data)
+
+
+
+class UsuarioDetail(generics.RetrieveUpdateAPIView):
+    queryset = Usuario.objects.all()
+    serializer_class = UsuarioSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        print(self.request.user.municipio)
+        # Devuelve el usuario autenticado
+        return self.request.user
+
+
+class UsuarioDetailMunicipio(generics.RetrieveUpdateAPIView):
+    queryset = Municipio.objects.all()
+    serializer_class = MunicipioSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        # Obtiene el usuario autenticado
+        user = self.request.user
+
+        # Verifica si el usuario tiene un municipio asociado
+        if hasattr(user, 'municipio'):
+            return user.municipio  # Devuelve el objeto Municipio asociado al usuario
+        else:
+            return Response("Municipio no encontrado para el usuario autenticado.")

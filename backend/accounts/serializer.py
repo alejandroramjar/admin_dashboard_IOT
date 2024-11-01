@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Variable, Provincia, Municipio, Dispositivo, Usuario, RegistroVariable
+from rest_framework import serializers
+from .models import Usuario
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -17,6 +19,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.is_active = True
         user.save()
         return user
+
+
+# serializers.py
+
+class UsuarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Usuario
+        fields = '__all__'
+
 
 
 class VariableSerializer(serializers.ModelSerializer):
@@ -43,12 +54,6 @@ class DispositivoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dispositivo
         fields = ['id', 'protocolo', 'identificador', 'variables_dict', 'descripcion', 'latitud', 'longitud']
-
-
-class UsuarioSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Usuario
-        fields = '__all__'
 
 
 class RegistroVariableSerializer(serializers.ModelSerializer):
