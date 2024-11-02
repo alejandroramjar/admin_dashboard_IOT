@@ -39,19 +39,19 @@ class Dispositivo(models.Model):
     descripcion = models.CharField(max_length=200)
     municipio = models.ForeignKey(Municipio, on_delete=models.DO_NOTHING, related_name='dispositivos')
     protocolo = models.CharField(max_length=200, choices=PROTOCOLO_CHOICES, null=True, blank=True)
-    identificador = models.CharField(max_length=200, unique=True)
+    nombre_identificador = models.CharField(max_length=200, unique=True)
     variables = models.ManyToManyField(Variable)
     latitud = models.DecimalField(max_digits=9, decimal_places=7, null=True, blank=True)
     longitud = models.DecimalField(max_digits=9, decimal_places=7, null=True, blank=True)
 
     def __str__(self):
-        return self.identificador
+        return self.nombre_identificador
 
     def subscribe(self):
         client = mqtt.Client()
         client.on_message = on_message
         client.connect("localhost", 1883, 60)
-        topic = f"dispositivo/{self.identificador}/data"
+        topic = f"dispositivo/{self.nombre_identificador}/data"
         client.subscribe(topic)
         client.loop_start()
         print(f"Suscrito a {topic}")
@@ -99,7 +99,7 @@ class RegistroVariable(models.Model):
                 dispositivo=self.dispositivo,
                 variable=self.variable,
                 valor=self.valor,
-                timestamp__date=self.timestamp.date()
+                timestamp__date=self.timestamp
         ).exists():
             super().save(*args, **kwargs)
         else:

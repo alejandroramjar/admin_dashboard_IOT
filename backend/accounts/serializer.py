@@ -21,7 +21,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-# serializers.py
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,7 +51,7 @@ class DispositivoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dispositivo
-        fields = ['id', 'protocolo', 'identificador', 'variables_dict', 'descripcion', 'latitud', 'longitud']
+        fields ='__all__'
 
 
 class RegistroVariableSerializer(serializers.ModelSerializer):

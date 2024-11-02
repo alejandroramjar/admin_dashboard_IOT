@@ -83,10 +83,23 @@
       /***
    * Actualiza el gráfico con los nuevos datos
    */
+
   updateChart() {
     if (this.chart) {
       this.chart.update(this.chartData); // Actualiza el gráfico con los nuevos datos
     }
+    if (this.$refs.chart) {
+        new Chartist.Line(
+          this.$refs.chart,
+          this.chartData,
+          {
+            ...this.chartOptions,
+            updateOnScrool: false // Evita actualizaciones durante el scroll
+          }
+        );
+      }
+
+
   },
       /***
        * Assigns a random id to the chart

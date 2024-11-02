@@ -15,7 +15,7 @@
                     </router-link></td>
           <td><router-link v-if="!checkifadmin" :to="{ name: 'Overview', params: {selectedDevice: item.id} }" class="btn btn-outline-warning">Monitorear
                     </router-link></td>
-          <td><div v-if="checkifadmin" @click="goToEditPage(item.id)" class="btn btn-outline-warning">Editar
+          <td><div v-if="checkifadmin" @click="goToEditPage(item.id)" class="btn btn-outline-warning">{{item}}Editar
                     </div></td>
         </slot>
       </tr>
@@ -45,7 +45,8 @@ export default {
 
   methods: {
       goToEditPage(id) {
-    window.location.href = `http://localhost:8000/admin/accounts/dispositivo/`;
+        console.log(id);
+    window.location.href = `http://localhost:8000/admin/accounts/dispositivo/${id}/change/`;
   },
     async checkIfAdmin(token) {
       try {

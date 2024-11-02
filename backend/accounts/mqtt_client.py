@@ -20,7 +20,7 @@ def on_message(client, userdata, message):
     valor = data.get('valor')
 
     try:
-        dispositivo = Dispositivo.objects.get(identificador=dispositivo_id)
+        dispositivo = Dispositivo.objects.get(nombre_identificador=dispositivo_id)
         variable = Variable.objects.get(nombre=variable_nombre)
 
         # Verifica si ya existe un registro para evitar duplicados
@@ -52,7 +52,7 @@ def check_for_new_devices(client):
     while True:
         # Verificar y suscribirse a nuevos dispositivos
         from .models import Dispositivo
-        dispositivos_existentes = {d.identificador for d in Dispositivo.objects.all()}
+        dispositivos_existentes = {d.nombre_identificador for d in Dispositivo.objects.all()}
 
         # Suscribirse a dispositivos que no están actualmente suscritos
         for dispositivo_id in dispositivos_existentes:
@@ -72,7 +72,7 @@ def start_mqtt_client():
 
     # Suscribirse a los dispositivos existentes al iniciar
     for dispositivo in Dispositivo.objects.all():
-        subscribe_to_device(client, dispositivo.identificador)
+        subscribe_to_device(client, dispositivo.nombre_identificador)
         
     # Iniciar el hilo para verificar nuevos dispositivos
     threading.Thread(target=check_for_new_devices, args=(client,), daemon=True).start()

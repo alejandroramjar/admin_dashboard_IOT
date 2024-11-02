@@ -1,25 +1,35 @@
-from rest_framework import viewsets, generics, status, permissions
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import render
+from rest_framework import viewsets, generics, status
+# from django.core.mail import send_mail
+from rest_framework import viewsets
+from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 from .models import Variable, Provincia, Municipio, Dispositivo, Usuario, RegistroVariable
 from .serializer import RegisterSerializer, ProvinciaSerializer, MunicipioSerializer, UsuarioSerializer, \
     DispositivoSerializer, VariableSerializer, ProvinciaSerializer, MunicipioSerializer, DispositivoSerializer, \
     UsuarioSerializer, RegistroVariableSerializer
 from rest_framework import viewsets
+from .models import Dispositivo, RegistroVariable
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework import generics
+from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics, permissions
 from .models import Usuario
 from .serializer import UsuarioSerializer
+
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import generics, permissions
 from .models import Dispositivo
 from .serializer import DispositivoSerializer
-from django.contrib.auth import authenticate, login
-from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth import logout
+
 
 class UserView(APIView):
     permission_classes = [IsAuthenticated]

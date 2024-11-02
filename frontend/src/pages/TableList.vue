@@ -53,7 +53,7 @@ export default {
         })
         this.tableData = response.data.map(dispositivo => ({
           Protocolo: dispositivo.protocolo,
-          Identificador: dispositivo.identificador,
+          Identificador: dispositivo.nombre_identificador,
           Variables: Array.isArray(dispositivo.variables_dict)
             ? dispositivo.variables_dict.join(', ')
             : JSON.stringify(dispositivo.variables_dict),

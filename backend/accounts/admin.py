@@ -5,7 +5,7 @@ from .models import Provincia, Municipio, Usuario, Variable, Dispositivo, Regist
 admin.site.site_header = 'Vigia Climático'
 admin.site.index_title = 'Panel de control'
 admin.site.site_title = 'Administrador de datos'
-admin.site.site_url = 'http://localhost:8082/#/admin/maps' # direccion del frontend(puerto del frontend), debe ser modificado siempre para el frontend.
+admin.site.site_url = 'http://localhost:8082/#/admin/overview' # direccion del frontend(puerto del frontend), debe ser modificado siempre para el frontend.
 
 
 # Registro del modelo Provincia en el panel de administración
@@ -54,13 +54,13 @@ class VariableAdmin(admin.ModelAdmin):
 
 @admin.register(Dispositivo)
 class DispositivoAdmin(admin.ModelAdmin):
-    list_display = ('identificador', 'descripcion', 'get_variables', 'municipio', 'protocolo', 'latitud', 'longitud')
+    list_display = ('nombre_identificador', 'descripcion', 'get_variables', 'municipio', 'protocolo', 'latitud', 'longitud')
     list_filter = ('municipio__provincia', 'municipio', 'protocolo', 'variables__nombre')
-    search_fields = ('identificador', 'descripcion')
+    search_fields = ('nombre_identificador', 'descripcion')
     filter_horizontal = ['variables']
     fieldsets = (
         (None, {
-            'fields': ('descripcion', 'municipio', 'protocolo', 'identificador', 'variables')
+            'fields': ('descripcion', 'municipio', 'protocolo', 'nombre_identificador', 'variables')
         }),
         ('Coordenadas', {
             'fields': ('latitud', 'longitud')
@@ -78,3 +78,4 @@ class RegistroVariableAdmin(admin.ModelAdmin):
     list_display = ('dispositivo', 'variable', 'valor', 'timestamp')
     list_filter = ('dispositivo', 'variable', 'timestamp')
     search_fields = ('dispositivo__identificador', 'variable__nombre')
+    ordering = ['timestamp']

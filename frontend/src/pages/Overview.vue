@@ -29,7 +29,7 @@
               <select id="deviceSelect" v-model="selectedDevice" @change="fetchDeviceData" class="form-control">
                 <option value="" disabled selected>Elige un dispositivo</option>
                 <option v-for="device in devices" :key="device.id" :value="device.id">
-                  {{ device.identificador }}
+                  {{ device.nombre_identificador }}
                 </option>
               </select>
             </div>
@@ -37,8 +37,14 @@
               <p>No tienes dispositivos asociados</p>
 
             </div>
-            <button class="btn btn-warning mt-3" @click="startMonitoring" :disabled="!selectedDevice">
+            <button v-if="!monitoring" class="btn btn-warning mt-3" @click="startMonitoring"
+                    :disabled="!selectedDevice">
               <i class="fa fa-play"></i> Monitorear
+              <div v-if="monitoring" class="spinner-border spinner-border-sm"></div>
+            </button>
+            <button v-if="monitoring" class="btn btn-warning mt-3" @click="stopMonitoring" :disabled="!selectedDevice">
+              <i class="fa fa-stop"></i> Detener
+              <div v-if="monitoring" class="spinner-border spinner-border-sm"></div>
             </button>
             <!-- Botones de exportación -->
             <button class="btn btn-primary mt-3" @click="exportToExcel" :disabled="!variables">
@@ -48,106 +54,31 @@
               <i class="fa fa-file-pdf-o"></i> Exportar a PDF
             </button>
 
-            <chart-card :chart-data="lineChart.data"
-                        :chart-options="lineChart.options"
-                        :responsive-options="lineChart.responsiveOptions"
-                        ref="chart">
-              <template slot="header">
-                <h4 class="card-title">Monitoreo en tiempo real</h4>
-                <p class="card-category">Últimas 24 horas</p>
-              </template>
-              <template slot="footer">
-                <div v-if="variables" class="legend">
-                  <div v-for="(color, variable) in legendColors" :key="variable">
-                    <i :class="`fa fa-circle ${color}`"></i> {{ variable }}
+            <div>
+              <chart-card
+                v-for="(variable, index) in Object.keys(variables)"
+                :key="index"
+                :ref="`chart_${index}`"
+                :chart-data="generateChartData(variable)"
+                :chart-options="lineChart.options"
+                :responsive-options="lineChart.responsiveOptions">
+                <template slot="header">
+                  <h4 class="card-title">{{ variable }}</h4>
+                  <p class="card-category">Últimas 24 horas</p>
+                </template>
+                <template slot="footer">
+                  <div class="stats">
+                    <i class="fa fa-history"></i> Actualizado hace {{ lastUpdate }} minutos
                   </div>
-                </div>
-                <hr>
-                <div class="stats">
-                  <i class="fa fa-history"></i> Actualizado hace {{ lastUpdate }} minutos
-                </div>
-              </template>
-            </chart-card>
+                </template>
+              </chart-card>
+            </div>
           </div>
         </div>
 
-        <!--        <div class="col-md-4">
-                  <chart-card :chart-data="pieChart.data" chart-type="Pie">
-                    <template slot="header">
-                      <h4 class="card-title">Email Statistics</h4>
-                      <p class="card-category">Last Campaign Performance</p>
-                    </template>
-                    <template slot="footer">
-                      <div class="legend">
-                        <i class="fa fa-circle text-info"></i> Open
-                        <i class="fa fa-circle text-danger"></i> Bounce
-                        <i class="fa fa-circle text-warning"></i> Unsubscribe
-                      </div>
-                      <hr>
-                      <div class="stats">
-                        <i class="fa fa-clock-o"></i> Campaign sent 2 days ago
-                      </div>
-                    </template>
-                  </chart-card>
-                </div>-->
       </div>
 
-      <!--      <div class="row">
-              <div class="col-md-6">
-                <chart-card
-                  :chart-data="barChart.data"
-                  :chart-options="barChart.options"
-                  :chart-responsive-options="barChart.responsiveOptions"
-                  chart-type="Bar">
-                  <template slot="header">
-                    <h4 class="card-title">2014 Sales</h4>
-                    <p class="card-category">All products including Taxes</p>
-                  </template>
-                  <template slot="footer">
-                    <div class="legend">
-                      <i class="fa fa-circle text-info"></i> Tesla Model S
-                      <i class="fa fa-circle text-danger"></i> BMW 5 Series
-                    </div>
-                    <hr>
-                    <div class="stats">
-                      <i class="fa fa-check"></i> Data information certified
-                    </div>
-                  </template>
-                </chart-card>
-              </div>
 
-      &lt;!&ndash;        <div class="col-md-6">
-                <card>
-                  <template slot="header">
-                    <h5 class="title">Tasks</h5>
-                    <p class="category">Backend development</p>
-                  </template>
-                  <l-table :data="tableData.data" :columns="tableData.columns">
-                    <template slot="columns"></template>
-                    <template slot-scope="{ row }">
-                      <td>
-                        <base-checkbox v-model="row.checked"></base-checkbox>
-                      </td>
-                      <td>{{ row.title }}</td>
-                      <td class="td-actions text-right">
-                        <button type="button" class="btn-simple btn btn-xs btn-info" v-tooltip.top-center="editTooltip">
-                          <i class="fa fa-edit"></i>
-                        </button>
-                        <button type="button" class="btn-simple btn btn-xs btn-danger" v-tooltip.top-center="deleteTooltip">
-                          <i class="fa fa-times"></i>
-                        </button>
-                      </td>
-                    </template>
-                  </l-table>
-                  <div class="footer">
-                    <hr>
-                    <div class="stats">
-                      <i class="fa fa-history"></i> Updated 3 minutes ago
-                    </div>
-                  </div>
-                </card>
-              </div>&ndash;&gt;
-            </div>-->
     </div>
   </div>
 </template>
@@ -156,8 +87,8 @@ import axios from 'axios';
 import ChartCard from 'src/components/Cards/ChartCard.vue';
 import StatsCard from 'src/components/Cards/StatsCard.vue';
 import LTable from 'src/components/Table.vue';
-import * as XLSX from  'xlsx';
-import { saveAs } from 'file-saver';
+import * as XLSX from 'xlsx';
+import {saveAs} from 'file-saver';
 import jsPDF from 'jspdf';
 import Chartist from 'chartist';
 
@@ -205,7 +136,7 @@ export default {
         },
         options: {
           low: 0,
-          high: 1000,
+          high: 100,
           showArea: false,
           height: '245px',
           axisX: {
@@ -230,6 +161,7 @@ export default {
         ]
       },
       lastUpdate: 0,
+      monitoring: false,
       barChart: {
         data: {
           labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -311,7 +243,7 @@ export default {
             }
           }
         );
-        console.log('Device data:', response.data); // verifica en consola que halla datos
+        //console.log('Device data:', response.data); // verifica en consola que halla datos
         if (response.data && response.data.data) {
           this.variables = response.data.data; // Accede al objeto de variables
           this.prepareColors(); // Llama a la función para preparar colores
@@ -337,28 +269,35 @@ export default {
       console.log('Updating chart with data:', data);
 
       if (data.labels && data.data) {
-        const lastTenLabels = data.labels.slice(-10); // Obtener los últimos 10 labels
-
-        // Prepara las series para el gráfico
+        const lastTenLabels = data.labels.slice(-10);
         const seriesData = Object.keys(data.data).map(variable => {
-          return data.data[variable].values.slice(-10); // acceder a .values
+          return data.data[variable].values.slice(-10);
         });
 
-        // Combinar las series en un solo objeto para chartData
         this.lineChart.data = {
           labels: lastTenLabels,
           series: seriesData
         };
 
-        console.log('Chart Data:', this.lineChart.data);
-
-        // Si estás usando un ref para acceder al componente, puedes llamar a updateChart
-        this.$refs.chart.updateChart();
+        // Modificar esta parte
+        if (this.$refs.charts && this.$refs.charts.length > 0) {
+          this.$refs.charts.forEach(chart => {
+            if (chart && typeof chart.updateChart === 'function') {
+              chart.updateChart();
+            }
+          });
+        }
 
         this.lastUpdate = 0;
       } else {
         console.error('Invalid data structure:', data);
       }
+      Object.keys(this.variables).forEach((variable, index) => {
+        const chartRef = this.$refs[`chart_${index}`];
+        if (chartRef && chartRef[0] && typeof chartRef[0].updateChart === 'function') {
+          chartRef[0].updateChart();
+        }
+      });
     },
     startMonitoring() {
       console.log('Starting monitoring for device:', this.selectedDevice); // Verifica el valor
@@ -366,7 +305,13 @@ export default {
         console.log('Fetching device data...'); // Verifica si se llama a la función
         this.fetchDeviceData();
         this.lastUpdate += 1; // Incrementa el tiempo desde la última actualización
-      }, 10000); // Actualizar cada 60 segundos
+        this.monitoring = true;
+      }, 6000); // Actualizar cada 60 segundos
+    },
+    stopMonitoring() {
+      console.log('Stopping monitoring for device:', this.selectedDevice);
+      clearInterval(this.intervalId); // Limpiar el intervalo
+      this.monitoring = false; // Actualizar el estado de monitoreo
     },
     async fetchDispositivosCount() {
       try {
@@ -380,89 +325,101 @@ export default {
         console.error('Error fetching dispositivos count:', error);
       }
     },
-async exportToExcel() {
-  try {
-    const response = await axios.get(`http://127.0.0.1:8000/apis/user/dispositivo/${this.selectedDevice}/data/`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+    async exportToExcel() {
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/apis/user/dispositivo/${this.selectedDevice}/data/`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        const data = response.data.data; // Accede a los datos
+        console.log('Data from API:', data); // Verifica la estructura de los datos
+
+        // Verifica que data sea un objeto y no esté vacío
+        if (typeof data !== 'object' || data === null || Object.keys(data).length === 0) {
+          console.error('La respuesta no tiene la estructura esperada:', data);
+          return;
+        }
+
+        const formattedData = this.formatDataForExport(data);
+
+        const worksheet = XLSX.utils.json_to_sheet(formattedData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos Meteorológicos');
+        const excelBuffer = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
+        const blob = new Blob([excelBuffer], {type: 'application/octet-stream'});
+        saveAs(blob, 'datos_meteorologicos.xlsx');
+      } catch (error) {
+        console.error('Error exporting to Excel:', error);
       }
-    });
+    },
 
-    const data = response.data.data; // Accede a los datos
-    console.log('Data from API:', data); // Verifica la estructura de los datos
+    async exportToPDF() {
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/apis/user/dispositivo/${this.selectedDevice}/data/`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
 
-    // Verifica que data sea un objeto y no esté vacío
-    if (typeof data !== 'object' || data === null || Object.keys(data).length === 0) {
-      console.error('La respuesta no tiene la estructura esperada:', data);
-      return;
+        const data = response.data.data; // Obtén los datos
+        const formattedData = this.formatDataForExport(data);
+
+        const doc = new jsPDF();
+        doc.text('Informe de Variables Meteorológicas', 10, 10);
+        let y = 20;
+
+        formattedData.forEach(item => {
+          for (const [key, value] of Object.entries(item)) {
+            doc.text(`${key}: ${value}`, 10, y);
+            y += 10; // Espaciado entre líneas
+          }
+          y += 10; // Espaciado entre dispositivos
+        });
+
+        doc.save('datos_meteorologicos.pdf');
+      } catch (error) {
+        console.error('Error exporting to PDF:', error);
+      }
+    },
+    generateChartData(variable) {
+      const data = this.variables[variable];
+      if (!data || !data.values) return {labels: [], series: [[]]};
+
+      const lastTenLabels = data.labels.slice(-10);
+      const lastTenValues = data.values.slice(-10);
+
+      return {
+        labels: lastTenLabels,
+        series: [lastTenValues]
+      };
+    },
+
+    formatDataForExport(data) {
+      const formattedData = [];
+
+      // Obtiene las etiquetas de la primera variable
+      const firstVariable = Object.values(data)[0];
+      const labels = firstVariable.labels; // Asumimos que todas las variables tienen las mismas etiquetas
+
+      // Itera sobre las etiquetas y crea un objeto para cada una
+      labels.forEach((label, index) => {
+        const row = {Label: label};
+
+        for (const variable in data) {
+          if (data[variable].values[index] !== undefined) {
+            row[variable] = data[variable].values[index]; // Agrega el valor correspondiente
+          } else {
+            row[variable] = 'N/A'; // Manejo de valores nulos
+          }
+        }
+
+        formattedData.push(row);
+      });
+
+      return formattedData;
     }
-
-    const formattedData = this.formatDataForExport(data);
-
-    const worksheet = XLSX.utils.json_to_sheet(formattedData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos Meteorológicos');
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(blob, 'datos_meteorologicos.xlsx');
-  } catch (error) {
-    console.error('Error exporting to Excel:', error);
-  }
-},
-
-async exportToPDF() {
-  try {
-    const response = await axios.get(`http://127.0.0.1:8000/apis/user/dispositivo/${this.selectedDevice}/data/`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-
-    const data = response.data.data; // Obtén los datos
-    const formattedData = this.formatDataForExport(data);
-
-    const doc = new jsPDF();
-    doc.text('Informe de Variables Meteorológicas', 10, 10);
-    let y = 20;
-
-    formattedData.forEach(item => {
-      for (const [key, value] of Object.entries(item)) {
-        doc.text(`${key}: ${value}`, 10, y);
-        y += 10; // Espaciado entre líneas
-      }
-      y += 10; // Espaciado entre dispositivos
-    });
-
-    doc.save('datos_meteorologicos.pdf');
-  } catch (error) {
-    console.error('Error exporting to PDF:', error);
-  }
-},
-
-formatDataForExport(data) {
-  const formattedData = [];
-
-  // Obtiene las etiquetas de la primera variable
-  const firstVariable = Object.values(data)[0];
-  const labels = firstVariable.labels; // Asumimos que todas las variables tienen las mismas etiquetas
-
-  // Itera sobre las etiquetas y crea un objeto para cada una
-  labels.forEach((label, index) => {
-    const row = { Label: label };
-
-    for (const variable in data) {
-      if (data[variable].values[index] !== undefined) {
-        row[variable] = data[variable].values[index]; // Agrega el valor correspondiente
-      } else {
-        row[variable] = 'N/A'; // Manejo de valores nulos
-      }
-    }
-
-    formattedData.push(row);
-  });
-
-  return formattedData;
-}
   }
 }
 </script>

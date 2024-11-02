@@ -87,10 +87,10 @@ def publish_data():
                 print(f"Publicado en {topic}: {mensaje}")
 
                 # Esperar un segundo entre publicaciones
-                time.sleep(1)  # Cambia si deseas una frecuencia diferente
+                time.sleep(0.05)  # Cambia si deseas una frecuencia diferente
 
             # Esperar un tiempo antes de pasar al siguiente dispositivo
-            time.sleep(5)  # Cambia el intervalo según sea necesario
+            time.sleep(0.05)  # Cambia el intervalo según sea necesario
 
 
 if __name__ == "__main__":
