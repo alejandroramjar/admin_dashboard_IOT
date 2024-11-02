@@ -205,7 +205,7 @@ export default {
         },
         options: {
           low: 0,
-          high: 100,
+          high: 1000,
           showArea: false,
           height: '245px',
           axisX: {

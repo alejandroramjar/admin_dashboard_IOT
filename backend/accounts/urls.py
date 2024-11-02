@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import RegistroUsuario, ProvinciaViewSet, MunicipioViewSet, UserDispositivosList, UserDispositivosCount, \
     VariableViewSet, ProvinciaViewSet, MunicipioViewSet, DispositivoViewSet, UsuarioViewSet, RegistroVariableViewSet, \
-    DispositivoDataViewSet, ProvinciaList, UserView, UsuarioDetail, UsuarioDetailMunicipio, DispositivoList
+    DispositivoDataViewSet, ProvinciaList, UserView, UsuarioDetail, UsuarioDetailMunicipio, DispositivoList, CustomTokenObtainPairView, \
+    LogoutView
 
 router = DefaultRouter()
 app_name = 'accounts'
@@ -17,6 +18,8 @@ router.register(r'registros', RegistroVariableViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('register/', RegistroUsuario.as_view(), name='registro_usuario'),
+    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('logout/', LogoutView.as_view(), name='logout'),
     path('user/', UserView.as_view(), name='user-info'),
     path('userD/', UsuarioDetail.as_view(), name='user-detail'),
     path('userD/municipio', UsuarioDetailMunicipio.as_view(), name='user-detail-municipio'),

@@ -52,16 +52,16 @@ export default {
           },
           (error) => {
             console.error('Error obteniendo la ubicación: ', error);
-            this.center.lat = 23.136667; // Ubicación predeterminada
-            this.center.lng = -82.358889; // Ubicación predeterminada
+            this.center.lat = 22.98744183004848; // Ubicación predeterminada
+            this.center.lng = -82.4658290633433; // Ubicación predeterminada
             this.initMap();
             this.notify('warning', 'Ubicación predeterminada', 'No se pudo obtener la ubicación, utilizando una ubicación predeterminada.');
           }
         );
       } else {
         console.error('Geolocalización no es soportada por este navegador.');
-        this.center.lat = 23.136667; // Ubicación predeterminada
-        this.center.lng = -82.358889; // Ubicación predeterminada
+        this.center.lat = 22.98744183004848; // Ubicación predeterminada UCI
+        this.center.lng = -82.4658290633433; // Ubicación predeterminada UCI
         this.initMap();
         this.notify('danger', 'Error', 'Geolocalización no soportada, usando ubicación predeterminada.');
       }

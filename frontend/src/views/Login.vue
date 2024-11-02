@@ -46,14 +46,15 @@ export default {
     async login() {
   try {
     document.getElementById('loader').style.display = 'block'; // Muestra el indicador de carga
-    const response = await axios.post('http://localhost:8000/api/token/', {
+    const response = await axios.post('http://localhost:8000/apis/token/', {
     //const response = await axios.post('http://localhost:8000/api-token-auth/', {
       username: this.username,
       password: this.password
     }, {
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      withCredentials: true
     });
     localStorage.setItem('token', response.data.access);
     console.log('Token guardado:', localStorage.getItem('token'));

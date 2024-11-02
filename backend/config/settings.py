@@ -82,6 +82,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'accounts.middelware.LogURLMiddleware',  # middleware para registro de solicitudes y eventos por dirección e IP
+    'accounts.middelware.TokenAuthMiddleware',  # middleware para verificacion auth mediante token para el admin site
+
 
 ]
 
@@ -90,6 +92,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:8082',
 ]
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'config.urls'
 
@@ -202,3 +205,9 @@ SITE_ID = 1
 DJANGO_HOST = config('DJANGO_HOST', default='127.0.0.1')
 DJANGO_PORT = config('DJANGO_PORT', default='8000')
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:8082')
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Almacena sesiones en la base de datos
+SESSION_COOKIE_NAME = 'sessionid'  # Nombre de la cookie
+SESSION_COOKIE_AGE = 12096  # Duración en segundos (2 semanas)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Mantiene la sesión abierta al cerrar el navegador
+SESSION_COOKIE_SECURE = False  # Solo enviar la cookie a través de HTTPS (opcional)

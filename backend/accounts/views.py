@@ -1,31 +1,25 @@
-from django.shortcuts import render
-from rest_framework import viewsets, generics, status
-# from django.core.mail import send_mail
-from rest_framework import viewsets
+from rest_framework import viewsets, generics, status, permissions
 from .models import Variable, Provincia, Municipio, Dispositivo, Usuario, RegistroVariable
 from .serializer import RegisterSerializer, ProvinciaSerializer, MunicipioSerializer, UsuarioSerializer, \
     DispositivoSerializer, VariableSerializer, ProvinciaSerializer, MunicipioSerializer, DispositivoSerializer, \
     UsuarioSerializer, RegistroVariableSerializer
 from rest_framework import viewsets
-from .models import Dispositivo, RegistroVariable
 from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework import generics
-from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import generics, permissions
 from .models import Usuario
 from .serializer import UsuarioSerializer
-
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import generics, permissions
 from .models import Dispositivo
 from .serializer import DispositivoSerializer
-
+from django.contrib.auth import authenticate, login
+from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import logout
 
 class UserView(APIView):
     permission_classes = [IsAuthenticated]
@@ -137,6 +131,24 @@ def register(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)  # Esto crea la cookie de sesión
+            access_token = AccessToken.for_user(user)
+            return Response({'access': str(access_token), 'is_admin': user.is_staff})
+        else:
+            return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class LogoutView(APIView):
+    def post(self, request):
+        logout(request)  # Esto cierra la sesión y elimina la cookie de sesión
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class UserDispositivosList(generics.ListAPIView):
     serializer_class = DispositivoSerializer

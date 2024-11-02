@@ -48,7 +48,8 @@ export default {
         const response = await axios.get('http://localhost:8000/apis/user/', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+          },
+         withCredentials: true
         });
         return response.data.is_admin;  // true si es admin, false en caso contrario
       } catch (error) {
@@ -57,15 +58,38 @@ export default {
       }
     },
     async logout() {
-      localStorage.removeItem('token');
-      this.$router.push('/login');
+      try {
+        // Llama a tu endpoint de logout en el servidor
+        await axios.post('http://localhost:8000/apis/logout/', {}, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          withCredentials: true // Asegúrate de enviar la cookie de sesión
+        });
+
+        // Elimina el token del localStorage
+        localStorage.removeItem('token');
+
+        // Redirige al usuario a la página de login
+        this.$router.push('/login');
+
+      } catch (error){
+        console.error('Error al cerrar sesión:', error);
+      }
     },
     async cuenta() {
       this.$router.push('/admin/user');
     },
     async admin() {
-      window.location.href = 'http://localhost:8000/admin/';
-    },
+    const token = localStorage.getItem('token');
+    // Solo redirigir si el token es válido
+    if (this.checkifadmin) {
+        window.location.href = `http://localhost:8000/admin/`;
+    } else {
+        console.error('No tienes permisos para acceder al admin site.');
+        // Opcional: redirigir a una página de error o mostrar un mensaje
+    }
+},
     toggleSidebar() {
       this.$sidebar.displaySidebar(!this.$sidebar.showSidebar);
     },
