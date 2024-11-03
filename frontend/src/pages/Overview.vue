@@ -37,20 +37,25 @@
               <p>No tienes dispositivos asociados</p>
 
             </div>
-            <button v-if="!monitoring" class="btn btn-warning mt-3" @click="startMonitoring"
+            <button v-if="closemonitoring" class="btn btn-warning mt-3" @click="startMonitoring"
                     :disabled="!selectedDevice">
               <i class="fa fa-play"></i> Monitorear
               <div v-if="monitoring" class="spinner-border spinner-border-sm"></div>
             </button>
+            <button v-if="initmonitoring" class="btn btn-warning mt-3" @click="stopMonitoring"
+                    :disabled="!selectedDevice">
+              <i class="fa fa-circle"></i> Iniciando
+              <div v-if="initmonitoring" class="spinner-border spinner-border-sm"></div>
+            </button>
             <button v-if="monitoring" class="btn btn-warning mt-3" @click="stopMonitoring" :disabled="!selectedDevice">
-              <i class="fa fa-stop"></i> Detener
+              <i class="fa fa-stop"></i> Monitoreando
               <div v-if="monitoring" class="spinner-border spinner-border-sm"></div>
             </button>
             <!-- Botones de exportación -->
-            <button class="btn btn-primary mt-3" @click="exportToExcel" :disabled="!variables">
+            <button v-if="monitoring" class="btn btn-primary mt-3" @click="exportToExcel" :disabled="!variables">
               <i class="fa fa-file-excel-o"></i> Exportar a Excel
             </button>
-            <button class="btn btn-danger mt-3" @click="exportToPDF" :disabled="!variables">
+            <button v-if="monitoring" class="btn btn-danger mt-3" @click="exportToPDF" :disabled="!variables">
               <i class="fa fa-file-pdf-o"></i> Exportar a PDF
             </button>
 
@@ -162,6 +167,8 @@ export default {
       },
       lastUpdate: 0,
       monitoring: false,
+      initmonitoring: false,
+      closemonitoring: true,
       barChart: {
         data: {
           labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -201,7 +208,12 @@ export default {
           {title: 'Unfollow 5 enemies from Twitter', checked: false}
         ]
       },
-      intervalId: null // Para guardar el ID del intervalo
+      intervalId: null, // Para guardar el ID del intervalo
+
+      cache: new Map(), // Para almacenar datos temporalmente
+      updateInterval: 10000, // Actualizar cada 1 segundo
+      lastFetchTime: 0,
+      minFetchInterval: 5000, // Mínimo 5 segundos entre llamadas al API
     };
   },
   created() {
@@ -211,6 +223,9 @@ export default {
   },
   beforeDestroy() {
     clearInterval(this.intervalId); // Limpiar el intervalo al destruir el componente
+    this.stopMonitoring();
+    this.cache.clear();
+
   },
   methods: {
     async fetchDevices() {
@@ -245,14 +260,20 @@ export default {
         );
         //console.log('Device data:', response.data); // verifica en consola que halla datos
         if (response.data && response.data.data) {
-          this.variables = response.data.data; // Accede al objeto de variables
-          this.prepareColors(); // Llama a la función para preparar colores
-        } else {
-          console.error('No se encontraron datos válidos en la respuesta.');
+          this.variables = response.data.data;
+          this.cache.set('lastData', response.data.data);
+          this.prepareColors();
+          this.updateChart(response.data);
         }
         this.updateChart(response.data); // Actualiza el gráfico con los nuevos datos
       } catch (error) {
         console.error('Error fetching device data:', error);
+        // Usar datos en caché si hay error
+        const cachedData = this.cache.get('lastData');
+        if (cachedData) {
+          this.variables = cachedData;
+          this.updateChart({data: cachedData, labels: this.lineChart.data.labels});
+        }
       }
     },
     prepareColors() {
@@ -300,18 +321,30 @@ export default {
       });
     },
     startMonitoring() {
-      console.log('Starting monitoring for device:', this.selectedDevice); // Verifica el valor
-      this.intervalId = setInterval(() => {
-        console.log('Fetching device data...'); // Verifica si se llama a la función
-        this.fetchDeviceData();
-        this.lastUpdate += 1; // Incrementa el tiempo desde la última actualización
-        this.monitoring = true;
-      }, 6000); // Actualizar cada 60 segundos
+      this.closemonitoring = false;
+      this.initmonitoring = true;
+
+      const updateUI = () => {
+        const now = Date.now();
+        if (now - this.lastFetchTime >= this.minFetchInterval) {
+          this.fetchDeviceData();
+          this.lastFetchTime = now;
+        } else {
+          // Usar datos en caché para actualizaciones intermedias
+          this.updateFromCache();
+        }
+        this.lastUpdate += 1;
+      };
+
+      this.intervalId = setInterval(updateUI, this.updateInterval);
+      this.initmonitoring = false;
+      this.monitoring = true;
     },
     stopMonitoring() {
       console.log('Stopping monitoring for device:', this.selectedDevice);
       clearInterval(this.intervalId); // Limpiar el intervalo
       this.monitoring = false; // Actualizar el estado de monitoreo
+      this.closemonitoring = true;
     },
     async fetchDispositivosCount() {
       try {
@@ -325,35 +358,101 @@ export default {
         console.error('Error fetching dispositivos count:', error);
       }
     },
-    async exportToExcel() {
-      try {
-        const response = await axios.get(`http://127.0.0.1:8000/apis/user/dispositivo/${this.selectedDevice}/data/`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+    updateFromCache() {
+      const cachedData = this.cache.get('lastData');
+      if (cachedData) {
+        Object.keys(cachedData).forEach(variable => {
+          if (cachedData[variable].values.length > 1) {
+            const lastValue = cachedData[variable].values[cachedData[variable].values.length - 1];
+            const prevValue = cachedData[variable].values[cachedData[variable].values.length - 2];
+            const interpolated = lastValue + (lastValue - prevValue) * 0.1;
+            // Solo actualiza si el valor interpolado es significativamente diferente
+            if (Math.abs(interpolated - lastValue) > 0.01) {
+              cachedData[variable].values.push(interpolated);
+              if (cachedData[variable].values.length > 10) {
+                cachedData[variable].values.shift();
+              }
+            }
           }
         });
-
-        const data = response.data.data; // Accede a los datos
-        console.log('Data from API:', data); // Verifica la estructura de los datos
-
-        // Verifica que data sea un objeto y no esté vacío
-        if (typeof data !== 'object' || data === null || Object.keys(data).length === 0) {
-          console.error('La respuesta no tiene la estructura esperada:', data);
-          return;
-        }
-
-        const formattedData = this.formatDataForExport(data);
-
-        const worksheet = XLSX.utils.json_to_sheet(formattedData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos Meteorológicos');
-        const excelBuffer = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
-        const blob = new Blob([excelBuffer], {type: 'application/octet-stream'});
-        saveAs(blob, 'datos_meteorologicos.xlsx');
-      } catch (error) {
-        console.error('Error exporting to Excel:', error);
+        this.updateChart({data: cachedData, labels: this.lineChart.data.labels});
       }
     },
+    async exportToExcel() {
+
+  try {
+
+    const response = await axios.get(`http://127.0.0.1:8000/apis/user/dispositivo/${this.selectedDevice}/data/`, {
+
+      headers: {
+
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+
+      }
+
+    });
+
+
+
+    const data = response.data.data; // Accede a los datos
+
+    console.log('Data from API:', data); // Verifica la estructura de los datos
+
+
+
+    // Verifica que data sea un objeto y no esté vacío
+
+    if (typeof data !== 'object' || data === null || Object.keys(data).length === 0) {
+
+      console.error('La respuesta no tiene la estructura esperada:', data);
+
+      return;
+
+    }
+
+
+
+    const formattedData = this.formatDataForExport(data);
+
+
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+
+    // Agregar encabezado con estilo
+
+    XLSX.utils.sheet_add_aoa(worksheet, [
+
+      ['Informe', ...Object.keys(data)]
+
+    ], {
+
+      font: {bold: true},
+
+      fill: {fgColor: {rgb: 'cccccc'}}, // Color de fondo gris claro
+
+      alignment: {horizontal: 'center'}
+
+    });
+
+
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Datos Meteorológicos');
+
+    const excelBuffer = XLSX.write(workbook, {bookType: 'xlsx', type: 'array'});
+
+    const blob = new Blob([excelBuffer], {type: 'application/octet-stream'});
+
+    saveAs(blob, 'datos_meteorologicos.xlsx');
+
+  } catch (error) {
+
+    console.error('Error exporting to Excel:', error);
+
+  }
+
+},
 
     async exportToPDF() {
       try {
@@ -366,19 +465,43 @@ export default {
         const data = response.data.data; // Obtén los datos
         const formattedData = this.formatDataForExport(data);
 
+        // Obtener la fecha y hora actual en el formato deseado
+        const fechaHoraActual = new Date().toLocaleString();
+
+        // Obtener el nombre del dispositivo
+        const dispositivo = this.devices.find(device => device.id === this.selectedDevice);
+        const nombreIdentificador = dispositivo ? dispositivo.nombre_identificador : 'Desconocido';
+
+
         const doc = new jsPDF();
-        doc.text('Informe de Variables Meteorológicas', 10, 10);
-        let y = 20;
+
+
+        // Crear el título con la fecha, hora y nombre del dispositivo
+        doc.setFontSize(16);
+        doc.text(`Informe de Variables Meteorológicas - ${nombreIdentificador}`, doc.internal.pageSize.getWidth() / 2, 10, {align: 'center'});
+        doc.setFontSize(12);
+        doc.text(`Generado el ${fechaHoraActual}`, doc.internal.pageSize.getWidth() / 2, 20, {align: 'center'});
+
+
+        let y = 30;
 
         formattedData.forEach(item => {
-          for (const [key, value] of Object.entries(item)) {
-            doc.text(`${key}: ${value}`, 10, y);
-            y += 10; // Espaciado entre líneas
-          }
-          y += 10; // Espaciado entre dispositivos
-        });
+          // Eliminar la iteración sobre las claves, ya que solo queremos el valor de 'Label'
+          const hora = item.Label; // Asumiendo que 'Label' siempre contiene la hora
 
-        doc.save('datos_meteorologicos.pdf');
+          // Imprimir la hora y los demás valores
+          doc.text(`Hora: ${hora}`, 10, y);
+          y += 10;
+          for (const [key, value] of Object.entries(item)) {
+            if (key !== 'Label') { // Evitar imprimir nuevamente la hora
+              doc.text(`${key}: ${value}`, 10, y);
+              y += 10;
+            }
+          }
+          y += 10; // Espacio entre registros
+        });
+        doc.save(`datos_meteorologicos_${nombreIdentificador}_${fechaHoraActual.replace(/[\/:\s]/g, '_')}.pdf`);
+
       } catch (error) {
         console.error('Error exporting to PDF:', error);
       }
