@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 import paho.mqtt.client as mqtt
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 import json
 
 
@@ -55,6 +57,12 @@ class Dispositivo(models.Model):
         client.subscribe(topic)
         client.loop_start()
         print(f"Suscrito a {topic}")
+
+# Manejador de la señal post_save
+@receiver(post_save, sender=Dispositivo)
+def subscribe_to_device(sender, instance, created, **kwargs):
+    if created:
+        instance.subscribe()  # Llama al método de suscripción del dispositivo
 
 
 def on_message(client, userdata, message):
