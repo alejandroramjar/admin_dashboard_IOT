@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      tableColumns: ['Protocolo', 'Identificador', 'Variables', 'Descripción', 'Coordenadas'],
+      tableColumns: ['Protocolo', 'NombreIdentificador', 'Variables', 'Descripción', 'Coordenadas'],
       tableData: [],
       errorMessage: null
     }
@@ -53,7 +53,7 @@ export default {
         })
         this.tableData = response.data.map(dispositivo => ({
           Protocolo: dispositivo.protocolo,
-          Identificador: dispositivo.nombre_identificador,
+          NombreIdentificador: dispositivo.nombre_identificador,
           Variables: Array.isArray(dispositivo.variables_dict)
             ? dispositivo.variables_dict.join(', ')
             : JSON.stringify(dispositivo.variables_dict),

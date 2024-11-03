@@ -34,7 +34,7 @@ class ModelsTestCase(TestCase):
             descripcion="Dispositivo de prueba",
             municipio=self.municipio,
             protocolo="mqtt",
-            identificador="disp001",
+            nombre_identificador="disp001",
             latitud=23.135,
             longitud=-82.358
         )
@@ -55,7 +55,7 @@ class ModelsTestCase(TestCase):
         self.assertEqual(self.dispositivo.descripcion, "Dispositivo de prueba")
         self.assertEqual(self.dispositivo.municipio.nombre, "Centro Habana")
         self.assertEqual(self.dispositivo.protocolo, "mqtt")
-        self.assertEqual(self.dispositivo.identificador, "disp001")
+        self.assertEqual(self.dispositivo.nombre_identificador, "disp001")
         self.assertEqual(self.dispositivo.latitud, 23.135)
         self.assertEqual(self.dispositivo.longitud, -82.358)
         self.assertIn(self.variable1, self.dispositivo.variables.all())

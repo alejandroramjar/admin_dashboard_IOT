@@ -21,7 +21,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
@@ -51,7 +50,7 @@ class DispositivoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dispositivo
-        fields ='__all__'
+        fields = '__all__'
 
 
 class RegistroVariableSerializer(serializers.ModelSerializer):

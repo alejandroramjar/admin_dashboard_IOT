@@ -5,6 +5,11 @@ from rest_framework import viewsets, generics, status
 from rest_framework import viewsets
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Dispositivo
 
 from .models import Variable, Provincia, Municipio, Dispositivo, Usuario, RegistroVariable
 from .serializer import RegisterSerializer, ProvinciaSerializer, MunicipioSerializer, UsuarioSerializer, \
@@ -245,6 +250,30 @@ class DispositivoList(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_staff:  # Verifica si es un administrador
-            return Dispositivo.objects.all()  # Devuelve todos los dispositivos
-        return user.dispositivos.all()  # Devuelve solo los dispositivos asociados al usuario
+        if user.is_staff:
+            dispositivos = Dispositivo.objects.all()
+            # Imprimir los IDs de todos los dispositivos
+            for dispositivo in dispositivos:
+                print(f"ID del dispositivo: {dispositivo.id}")
+            return dispositivos
+        else:
+            dispositivos = user.dispositivos.all()
+            # Imprimir los IDs de los dispositivos del usuario
+            for dispositivo in dispositivos:
+                print(f"ID del dispositivo: {dispositivo.id}")
+            return dispositivos
+
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def consultar_id(request, id):
+    try:
+        dispositivo = Dispositivo.objects.get(pk=id)
+    except Dispositivo.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serializer = DispositivoSerializer(dispositivo)
+    return Response(serializer.data)
+
