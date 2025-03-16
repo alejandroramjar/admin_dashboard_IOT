@@ -5,7 +5,7 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-&zu@2a2%s80nh2th38!-qpw&_vjy-^09div7eag4rr@l0pa$!5'
+SECRET_KEY = 'hahaha'
 
 DEBUG = True
 
@@ -187,8 +187,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ***********************CONFIG EMAIL********************************************
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'koredatatesting@gmail.com'  # koredatatesting@gmail.com
-EMAIL_HOST_PASSWORD = 'audj ucrj qlbk xmon'  # audj ucrj qlbk xmon
+EMAIL_HOST_USER = 'jajaja'
+EMAIL_HOST_PASSWORD = 'hahaha'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 ADMIN_EMAIL = 'ramjar2107@gmail.com'
